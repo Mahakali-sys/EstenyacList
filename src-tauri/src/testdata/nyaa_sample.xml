@@ -1,0 +1,44 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyaa="https://nyaa.si/xmlns/nyaa" version="2.0">
+	<channel>
+		<title>Nyaa - &#34;solo leveling&#34; - Torrent File RSS</title>
+		<description>RSS Feed for &#34;solo leveling&#34;</description>
+		<link>https://nyaa.si/</link>
+		<atom:link href="https://nyaa.si/?page=rss" rel="self" type="application/rss+xml" />
+		<item>
+			<title>[dtr] Solo Leveling - S01 (BD 1080p HEVC x265 Opus) [Multi-Audio] (Japanese, German/Deutsch, English Dubs) | Ore dake Level Up na Ken Season 1</title>
+				<link>https://nyaa.si/download/2156068.torrent</link>
+				<guid isPermaLink="true">https://nyaa.si/view/2156068</guid>
+				<pubDate>Fri, 04 Sep 2026 03:15:29 -0000</pubDate>
+
+				<nyaa:seeders>22</nyaa:seeders>
+				<nyaa:leechers>0</nyaa:leechers>
+				<nyaa:downloads>368</nyaa:downloads>
+				<nyaa:infoHash>856a43e6c231e6e2fe89b04936c45d71fb6b9024</nyaa:infoHash>
+			<nyaa:categoryId>1_2</nyaa:categoryId>
+			<nyaa:category>Anime - English-translated</nyaa:category>
+			<nyaa:size>51.9 GiB</nyaa:size>
+			<nyaa:comments>0</nyaa:comments>
+			<nyaa:trusted>No</nyaa:trusted>
+			<nyaa:remake>No</nyaa:remake>
+			<description><![CDATA[<a href="https://nyaa.si/view/2156068">#2156068 | [dtr] Solo Leveling - S01 (BD 1080p HEVC x265 Opus) [Multi-Audio] (Japanese, German/Deutsch, English Dubs) | Ore dake Level Up na Ken Season 1</a> | 51.9 GiB | Anime - English-translated | 856a43e6c231e6e2fe89b04936c45d71fb6b9024]]></description>
+		</item>
+		<item>
+			<title>[A2p] Solo Leveling -Beyond the System- Concept PV (WEB 1080p) v2</title>
+				<link>https://nyaa.si/download/2128651.torrent</link>
+				<guid isPermaLink="true">https://nyaa.si/view/2128651</guid>
+				<pubDate>Sun, 05 Jul 2026 08:57:02 -0000</pubDate>
+
+				<nyaa:seeders>13</nyaa:seeders>
+				<nyaa:leechers>0</nyaa:leechers>
+				<nyaa:downloads>509</nyaa:downloads>
+				<nyaa:infoHash>050100ce3f711877ed02e9e61cfab767bdc78f3a</nyaa:infoHash>
+			<nyaa:categoryId>1_2</nyaa:categoryId>
+			<nyaa:category>Anime - English-translated</nyaa:category>
+			<nyaa:size>127.7 MiB</nyaa:size>
+			<nyaa:comments>0</nyaa:comments>
+			<nyaa:trusted>No</nyaa:trusted>
+			<nyaa:remake>No</nyaa:remake>
+			<description><![CDATA[<a href="https://nyaa.si/view/2128651">#2128651 | [A2p] Solo Leveling -Beyond the System- Concept PV (WEB 1080p) v2</a> | 127.7 MiB | Anime - English-translated | 050100ce3f711877ed02e9e61cfab767bdc78f3a]]></description>
+		</item>
+</channel>
+</rss>

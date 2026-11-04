@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Local runtime data and personal exports
+*.db
+*.db-shm
+*.db-wal
+estenyac_backup_*.xml
+estenyac_search.log
+cache/
+scrape_anilist*.xml
+tauri-2-anime-listing-app.json
+/Screenshots/
+
+# Bundled runtime binary, published with the release instead
+libmpv-2.dll
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Local debugging scripts, except the notice generator
+/scripts/*
+!/scripts/generate-third-party-notices.mjs
+
+# Editors and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

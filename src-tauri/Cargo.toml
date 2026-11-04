@@ -1,0 +1,49 @@
+[package]
+name = "estenyac-list"
+version = "0.1.0"
+description = "Portable anime & manga list manager with airing schedule and release tracking"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/Mahakali-sys/EstenyacList"
+edition = "2021"
+
+[lib]
+name = "estenyac_list_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-notification = "2"
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.33", features = ["bundled"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "http2"] }
+tokio = { version = "1", features = ["full"] }
+anyhow = "1"
+chrono = { version = "0.4", features = ["serde"] }
+chrono-tz = "0.10"
+quick-xml = "0.37"
+base64 = "0.22"
+url = "2"
+log = "0.4"
+jixel = "0.4.2"
+jxl-oxide = "0.12"
+zune-jpeg = "0.5"
+jpeg-encoder = "0.7"
+# embedded torrent engine + local HTTP streaming (mpv plays the stream URL)
+librqbit = { version = "9", default-features = false, features = ["rust-tls", "http-api", "tracing-subscriber-utils", "storage_examples", "disable-upload"] }
+librqbit-core = { version = "9", default-features = false }
+librqbit-dualstack-sockets = "0.7"
+# runtime-loaded libmpv-2.dll (no build-time linking) + video overlay window
+windows-sys = { version = "0.52", features = [
+  "Win32_Foundation",
+  "Win32_System_LibraryLoader",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_Graphics_Gdi",
+] }
+
+[profile.dev]
+incremental = true

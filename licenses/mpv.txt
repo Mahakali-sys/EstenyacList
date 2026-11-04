@@ -1,0 +1,30 @@
+mpv / libmpv
+============
+
+The EstenyacList release installer and portable build include the file
+libmpv-2.dll.
+
+Version: v0.41.0-1308-gbaa3e11d4
+Source commit: baa3e11d4
+License: GNU General Public License, version 2 or later
+
+mpv is developed by the mpv project and its contributors.
+
+Project source:
+https://github.com/mpv-player/mpv
+
+Exact source revision:
+https://github.com/mpv-player/mpv/tree/baa3e11d4
+
+Windows build scripts used by common mpv Windows builds:
+https://github.com/shinchiro/mpv-winbuild-cmake
+
+The full text of the GNU General Public License version 2 is included in
+licenses/GPL-2.0.txt. The EstenyacList source is licensed under the GNU
+General Public License version 3 or later; see LICENSE in the root of the
+repository.
+
+mpv is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+details.
