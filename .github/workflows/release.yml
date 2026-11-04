@@ -1,0 +1,197 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: "Create the release as a draft"
+        required: false
+        default: false
+        type: boolean
+      prerelease:
+        description: "Mark the release as a prerelease"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish Windows release
+    runs-on: windows-2022
+    timeout-minutes: 90
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Read and validate version
+        id: version
+        shell: pwsh
+        run: |
+          $tauri = Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json
+          $version = [string]$tauri.version
+          $package = Get-Content package.json -Raw | ConvertFrom-Json
+          $cargoMatch = Select-String -Path src-tauri/Cargo.toml -Pattern '^version = "(.+)"' | Select-Object -First 1
+          $cargoVersion = $cargoMatch.Matches[0].Groups[1].Value
+
+          if ($version -notmatch '^\d+\.\d+\.\d+$') {
+            throw "Invalid version in tauri.conf.json: $version"
+          }
+          if ($package.version -ne $version) {
+            throw "package.json version $($package.version) does not match tauri.conf.json version $version"
+          }
+          if ($cargoVersion -ne $version) {
+            throw "Cargo.toml version $cargoVersion does not match tauri.conf.json version $version"
+          }
+
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "tag=v$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "Building EstenyacList $version from $env:GITHUB_SHA"
+
+      - name: Check that the release does not exist
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ steps.version.outputs.tag }}"
+          $localTag = git tag --list $tag
+          if ($localTag) {
+            throw "Tag $tag already exists. Bump the version before releasing."
+          }
+
+          $existingRelease = gh release list --limit 100 --json tagName --jq '.[].tagName' | Where-Object { $_ -eq $tag }
+          if ($existingRelease) {
+            throw "Release $tag already exists. Bump the version before releasing."
+          }
+
+          Write-Host "Release $tag does not exist yet."
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Rust toolchain
+        shell: pwsh
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal --no-self-update
+          rustup default 1.97.1
+          rustc --version
+          cargo --version
+
+      - name: Cache Cargo registry
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Download and verify libmpv
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download deps-libmpv-v0.41.0-1308 --pattern libmpv-2.dll --dir . --clobber
+
+          $expected = "db5c52a6cab5484967a69c1554fb324966d4c4fa9f9bb2423d2f4ec19a148278"
+          $actual = (Get-FileHash .\libmpv-2.dll -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne $expected) {
+            throw "libmpv-2.dll checksum mismatch. Expected $expected, got $actual."
+          }
+          Write-Host "libmpv-2.dll checksum verified."
+
+      - name: Install npm dependencies
+        shell: pwsh
+        run: npm ci
+
+      - name: Verify Cargo lockfile
+        shell: pwsh
+        run: cargo metadata --locked --format-version 1 --manifest-path src-tauri/Cargo.toml | Out-Null
+
+      - name: Build application and installer
+        shell: pwsh
+        run: npm run tauri build
+
+      - name: Assemble release assets
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $assets = Join-Path $env:GITHUB_WORKSPACE "release-assets"
+          New-Item -ItemType Directory -Force $assets | Out-Null
+
+          $installer = "src-tauri/target/release/bundle/nsis/EstenyacList_${version}_x64-setup.exe"
+          if (-not (Test-Path $installer)) {
+            throw "Installer not found at $installer"
+          }
+          Copy-Item $installer $assets
+
+          $stage = Join-Path $env:RUNNER_TEMP "EstenyacList-portable"
+          if (Test-Path $stage) {
+            Remove-Item -Recurse -Force $stage
+          }
+          New-Item -ItemType Directory -Force "$stage/licenses" | Out-Null
+          Copy-Item "src-tauri/target/release/estenyac-list.exe" "$stage/EstenyacList.exe"
+          Copy-Item libmpv-2.dll $stage
+          Copy-Item README.md, LICENSE, COPYRIGHT, THIRD_PARTY_NOTICES.md $stage
+          Copy-Item licenses/GPL-2.0.txt, licenses/mpv.txt "$stage/licenses"
+
+          $zip = Join-Path $assets "EstenyacList_${version}_x64-portable.zip"
+          Compress-Archive -Path "$stage/*" -DestinationPath $zip -CompressionLevel Optimal
+
+          Copy-Item libmpv-2.dll $assets
+
+          $files = @(
+            "EstenyacList_${version}_x64-setup.exe",
+            "EstenyacList_${version}_x64-portable.zip",
+            "libmpv-2.dll"
+          )
+          $lines = foreach ($file in $files) {
+            $hash = (Get-FileHash (Join-Path $assets $file) -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $file"
+          }
+          $lines | Out-File -Encoding ascii (Join-Path $assets "SHA256SUMS.txt")
+
+          Get-ChildItem $assets | Select-Object Name, Length | Format-Table -AutoSize
+
+      - name: Create GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $tag = "${{ steps.version.outputs.tag }}"
+          $assets = Join-Path $env:GITHUB_WORKSPACE "release-assets"
+
+          $notes = (Get-Content .github/release-notes.md -Raw).Replace("{{VERSION}}", $version).Replace("{{COMMIT}}", $env:GITHUB_SHA)
+          $notesPath = Join-Path $env:RUNNER_TEMP "release-notes.md"
+          $notes | Out-File -Encoding utf8 $notesPath
+
+          $ghArgs = @(
+            "release", "create", $tag,
+            "--target", $env:GITHUB_SHA,
+            "--title", "EstenyacList v$version",
+            "--notes-file", $notesPath
+          )
+          if ("${{ inputs.draft }}" -eq "true") {
+            $ghArgs += "--draft"
+          }
+          if ("${{ inputs.prerelease }}" -eq "true") {
+            $ghArgs += "--prerelease"
+          }
+          $ghArgs += (Get-ChildItem $assets -File | ForEach-Object { $_.FullName })
+          gh @ghArgs
