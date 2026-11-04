@@ -167,6 +167,7 @@ Anime and manga metadata, cover images, and screenshots of cover art belong to t
 ## Repository policy
 
 This is a personal project. Issues are open for bug reports and questions. The repository is configured so that only the owner can push commits. Pull requests from other people are not accepted.
+Fell free to fork, modify and release it, its AI Generated afterall.
 
 ## Disclaimer
 
