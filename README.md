@@ -4,7 +4,7 @@ EstenyacList is a portable anime and manga tracker for Windows. It keeps your li
 
 The app is built with Tauri 2 (Rust) and React with Tailwind CSS v4. It is designed for Windows 10 and Windows 11, x64 only.
 
-## This project is 100% vibecoded
+## This project is 100% vibecoded. Yes, this README was AI Generated as well.
 
 This is not a polished product from a software company. The entire application was built by prompting an AI coding agent. There has been no professional code review, no security audit, and no long-term maintenance plan.
 
