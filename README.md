@@ -12,6 +12,9 @@ It works for my personal use. Treat it as experimental software. Keep backups of
 
 ## Screenshots
 
+<details>
+<summary>Show screenshots</summary>
+
 ### Airing schedule
 
 The weekly schedule is grouped by day and hour, with release results, torrent sizes, seeders, queue buttons, and playback buttons directly on each card.
@@ -55,6 +58,8 @@ Dark and light themes, accent colors, list or grid view, RAM or disk streaming, 
 Nyaa and nekoBT configuration, saved title filters, quality preferences, fansub groups, and automatic searches after an episode airs.
 
 ![Release tracking settings](docs/screenshots/settings-releases.png)
+
+</details>
 
 ## Features
 
