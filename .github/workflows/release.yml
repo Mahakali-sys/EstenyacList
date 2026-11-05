@@ -106,9 +106,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release download deps-libmpv-v0.41.0-1308 --pattern libmpv-2.dll --dir . --clobber
+          gh release download deps-libmpv-v0.41.0-1308-20261026 --pattern libmpv-2.dll --dir . --clobber
 
-          $expected = "db5c52a6cab5484967a69c1554fb324966d4c4fa9f9bb2423d2f4ec19a148278"
+          $expected = "3c9345131a3ef7a0bc18d1ae1137c523597d980a0c3c962c71f2cbbed5960e52"
           $actual = (Get-FileHash .\libmpv-2.dll -Algorithm SHA256).Hash.ToLowerInvariant()
           if ($actual -ne $expected) {
             throw "libmpv-2.dll checksum mismatch. Expected $expected, got $actual."

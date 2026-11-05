@@ -6,7 +6,7 @@ This file lists the third-party software used by the project. It covers the nati
 
 ## Bundled native components
 
-The release installer and portable build include `libmpv-2.dll` (122,211,840 bytes, SHA-256 `db5c52a6cab5484967a69c1554fb324966d4c4fa9f9bb2423d2f4ec19a148278`). It reports mpv `v0.41.0-1308-gbaa3e11d4` built from mpv commit `baa3e11d4`.
+The release installer and portable build include `libmpv-2.dll` (122,230,272 bytes, SHA-256 `3c9345131a3ef7a0bc18d1ae1137c523597d980a0c3c962c71f2cbbed5960e52`). It reports mpv `v0.41.0-1308-gbaa3e11d4` built from mpv commit `baa3e11d4`.
 
 The DLL is a combined work distributed under the GNU General Public License, version 3 or later. mpv itself is GPL-2.0-or-later, and FFmpeg is configured with `--enable-gpl --enable-version3`; the GPL-2.0-or-later codec libraries are compatible with the GPLv3. The GPL-2.0 text is in [licenses/GPL-2.0.txt](licenses/GPL-2.0.txt) and the GPL-3.0 text is in [LICENSE](LICENSE).
 
@@ -17,9 +17,9 @@ Build attribution:
 - Native build scripts: https://github.com/shinchiro/mpv-winbuild-cmake/tree/1f8d2e76255abc48f0456d9be99b4cab9c6566e6 (2026-10-11)
 - Builder: https://github.com/zhongfly/mpv-winbuild
 - Reference build run: https://github.com/zhongfly/mpv-winbuild/actions/runs/40319247741
-- Binary build timestamp: 2026-10-25 00:10:58
+- Binary build timestamp: 2026-10-26 12:32:30
 
-Provenance note: The binary reports mpv v0.41.0-1308-gbaa3e11d4, a 2026-10-25 build, and identifies as a zhongfly/mpv-winbuild build. Its SHA-256 does not match the published zhongfly 2026-10-25 or 2026-10-26 archives. The native component attribution uses the newest shinchiro/mpv-winbuild-cmake revision before the binary's build timestamp; the reference build run is linked for comparison.
+Provenance note: The binary is libmpv-2.dll from the published zhongfly/mpv-winbuild 2026-10-26-baa3e11d42 release archive, with a build timestamp of 2026-10-26 12:32:30 and FFmpeg N-128097-g46f23be8b. Its SHA-256 matches that release artifact. The native component attribution uses shinchiro/mpv-winbuild-cmake commit 1f8d2e76255abc48f0456d9be99b4cab9c6566e6, which was the newest revision before the build timestamp; the reference build run that produced the release is linked.
 
 The table below lists 93 native components: 86 statically linked, 6 build-time header packages, and 1 runtime import. Version strings reported by the binary are listed where available. For components without a reported version, the exact revision depends on the build and is not recoverable from the binary alone; the upstream project is linked.
 
@@ -41,7 +41,7 @@ The table below lists 93 native components: 86 statically linked, 6 build-time h
 | davs2 | not recorded | GPL-2.0-or-later | Statically linked | - | [source](https://github.com/saindriches/davs2) |
 | Expat | not recorded | MIT | Statically linked | - | [source](https://github.com/libexpat/libexpat) |
 | fast_float | not recorded | Apache-2.0 OR MIT OR BSL-1.0 | Statically linked | - | [source](https://github.com/fastfloat/fast_float) |
-| FFmpeg | N-128076-g3719f257c | GPL-3.0-or-later | Statically linked | Built with --enable-gpl and --enable-version3. | [source](https://github.com/FFmpeg/FFmpeg) |
+| FFmpeg | N-128097-g46f23be8b | GPL-3.0-or-later | Statically linked | Built with --enable-gpl and --enable-version3. | [source](https://github.com/FFmpeg/FFmpeg) |
 | fontconfig | not recorded | MIT | Statically linked | - | [source](https://gitlab.freedesktop.org/fontconfig/fontconfig) |
 | FreeType | not recorded | FTL OR GPL-2.0-or-later | Statically linked | - | [source](https://github.com/freetype/freetype) |
 | FriBidi | 1.0.17 | LGPL-2.1-or-later | Statically linked | - | [source](https://github.com/fribidi/fribidi) |

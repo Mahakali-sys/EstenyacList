@@ -2,6 +2,12 @@
 
 Built from commit `{{COMMIT}}` by the release workflow on GitHub Actions.
 
+## Changes
+
+- Long anime titles no longer overflow the "Play next" button in the watch queue.
+- Playing an episode from an entry's detail sheet now closes the sheet so the player bar is visible.
+- In-app notifications no longer clip and move above the player bar while it is open.
+
 ## Assets
 
 - `EstenyacList_{{VERSION}}_x64-setup.exe`: per-user installer. It includes libmpv, so the built-in player works without extra setup.

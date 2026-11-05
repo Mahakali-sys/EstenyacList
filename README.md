@@ -145,7 +145,7 @@ The repository pins the toolchain versions used for release builds in `rust-tool
 
 ## Releases
 
-Releases are built on GitHub Actions with the manual `Release` workflow in [.github/workflows/release.yml](.github/workflows/release.yml). The workflow reads the version from `src-tauri/tauri.conf.json`, checks that it matches `package.json` and `src-tauri/Cargo.toml`, refuses to run if the tag or release already exists, downloads the pinned libmpv binary from the `deps-libmpv-v0.41.0-1308` dependency release and verifies its SHA-256, builds the installer and portable ZIP, writes `SHA256SUMS.txt`, and creates the GitHub release.
+Releases are built on GitHub Actions with the manual `Release` workflow in [.github/workflows/release.yml](.github/workflows/release.yml). The workflow reads the version from `src-tauri/tauri.conf.json`, checks that it matches `package.json` and `src-tauri/Cargo.toml`, refuses to run if the tag or release already exists, downloads the pinned libmpv binary from the `deps-libmpv-v0.41.0-1308-20261026` dependency release and verifies its SHA-256, builds the installer and portable ZIP, writes `SHA256SUMS.txt`, and creates the GitHub release.
 
 The repository owner starts the workflow from the Actions tab. It is not triggered by pushes or tags. To release a new version, bump the version in all three files, commit and push, then run the workflow from `main`. If a release fails, delete the tag and release before retrying.
 

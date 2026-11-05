@@ -1,11 +1,11 @@
 {
   "binary": {
     "file": "libmpv-2.dll",
-    "sha256": "db5c52a6cab5484967a69c1554fb324966d4c4fa9f9bb2423d2f4ec19a148278",
-    "size": 122211840,
+    "sha256": "3c9345131a3ef7a0bc18d1ae1137c523597d980a0c3c962c71f2cbbed5960e52",
+    "size": 122230272,
     "version": "v0.41.0-1308-gbaa3e11d4",
     "sourceCommit": "baa3e11d4",
-    "buildTimestamp": "2026-10-25T00:10:58",
+    "buildTimestamp": "2026-10-26T12:32:30",
     "builder": "https://github.com/zhongfly/mpv-winbuild",
     "buildScripts": {
       "repository": "https://github.com/shinchiro/mpv-winbuild-cmake",
@@ -13,7 +13,7 @@
       "date": "2026-10-11"
     },
     "referenceBuildRun": "https://github.com/zhongfly/mpv-winbuild/actions/runs/40319247741",
-    "provenanceNote": "The binary reports mpv v0.41.0-1308-gbaa3e11d4, a 2026-10-25 build, and identifies as a zhongfly/mpv-winbuild build. Its SHA-256 does not match the published zhongfly 2026-10-25 or 2026-10-26 archives. The native component attribution uses the newest shinchiro/mpv-winbuild-cmake revision before the binary's build timestamp; the reference build run is linked for comparison."
+    "provenanceNote": "The binary is libmpv-2.dll from the published zhongfly/mpv-winbuild 2026-10-26-baa3e11d42 release archive, with a build timestamp of 2026-10-26 12:32:30 and FFmpeg N-128097-g46f23be8b. Its SHA-256 matches that release artifact. The native component attribution uses shinchiro/mpv-winbuild-cmake commit 1f8d2e76255abc48f0456d9be99b4cab9c6566e6, which was the newest revision before the build timestamp; the reference build run that produced the release is linked."
   },
   "licenses": {
     "0BSD": "licenses/native/0BSD.txt",
@@ -57,7 +57,7 @@
     },
     {
       "name": "FFmpeg",
-      "version": "N-128076-g3719f257c",
+      "version": "N-128097-g46f23be8b",
       "license": "GPL-3.0-or-later",
       "role": "linked",
       "url": "https://github.com/FFmpeg/FFmpeg",
