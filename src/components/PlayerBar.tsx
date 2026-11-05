@@ -19,8 +19,8 @@ import { useStore } from "../store";
 import { Dropdown } from "./Dropdown";
 import { IconBtn } from "./ui";
 
-// menu width (264px) plus the 8px gap it keeps from the window edge
-const TRACK_MENU_INSET = 272;
+// menu width (264px) plus its window margin and a small gap to the video
+const TRACK_MENU_INSET = 280;
 
 function trackName(track: TrackInfo): string {
   const title = track.title?.trim();
@@ -415,8 +415,8 @@ export function PlayerBar() {
 
       {embedded && !player.resolving ? (
         <Dropdown
-          align="right"
-          className="w-[264px]"
+          align="window"
+          className="max-h-[calc(100vh-68px)] w-[264px] overflow-y-auto"
           onOpenChange={(open) => {
             void api
               .playerSetSideInset(open ? TRACK_MENU_INSET : 0)

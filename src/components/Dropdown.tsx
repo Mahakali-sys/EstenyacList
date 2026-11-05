@@ -10,7 +10,8 @@ export function Dropdown({
 }: {
   trigger: React.ReactNode;
   children: (close: () => void) => React.ReactNode;
-  align?: "left" | "right";
+  /** "window" pins the menu to the window's right margin instead of the trigger. */
+  align?: "left" | "right" | "window";
   className?: string;
   onOpenChange?: (open: boolean) => void;
 }) {
@@ -35,7 +36,8 @@ export function Dropdown({
       const p: { top: number; left?: number; right?: number } = {
         top: r.bottom + 4,
       };
-      if (align === "right") p.right = Math.max(8, window.innerWidth - r.right);
+      if (align === "window") p.right = 8;
+      else if (align === "right") p.right = Math.max(8, window.innerWidth - r.right);
       else p.left = Math.max(8, r.left);
       setPos(p);
     };
