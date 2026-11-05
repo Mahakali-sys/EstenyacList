@@ -539,7 +539,7 @@ impl Db {
             let delta = new_progress - prev_progress;
             if delta > 0 {
                 let day = chrono::Utc::now()
-                    .with_timezone(&chrono_tz::America::Sao_Paulo)
+                    .with_timezone(&Self::time_zone_from(&c))
                     .date_naive()
                     .format("%Y-%m-%d")
                     .to_string();
@@ -730,6 +730,25 @@ impl Db {
              ON CONFLICT(key) DO UPDATE SET value = excluded.value",
             params![key, value.to_string()],
         );
+    }
+
+    /// Selected IANA zone, defaulting to US Eastern. Uses the caller's
+    /// connection because the mutex is not reentrant.
+    fn time_zone_from(c: &Connection) -> chrono_tz::Tz {
+        c.query_row(
+            "SELECT value FROM settings WHERE key = 'time_zone'",
+            [],
+            |r| r.get::<_, String>(0),
+        )
+        .ok()
+        .and_then(|s| serde_json::from_str::<String>(&s).ok())
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(chrono_tz::America::New_York)
+    }
+
+    /// Selected IANA zone, defaulting to US Eastern.
+    pub fn time_zone(&self) -> chrono_tz::Tz {
+        Self::time_zone_from(&self.conn())
     }
 
     // ---------- media groups (per-anime nekoBT group prefs) ----------

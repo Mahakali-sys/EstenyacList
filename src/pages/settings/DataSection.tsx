@@ -12,12 +12,14 @@ import { useEffect, useState } from "react";
 import { Bar, Btn, Label, Panel } from "../../components/ui";
 import { api } from "../../lib/api";
 import type { BackupInfo } from "../../lib/types";
+import { DEFAULT_TIME_ZONE } from "../../lib/types";
 import { useStore } from "../../store";
 
 const LBL = "mb-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint";
 
 export function DataSection() {
   const toast = useStore((s) => s.toast);
+  const timeZone = useStore((s) => s.settings.timeZone ?? DEFAULT_TIME_ZONE);
   const importPhase = useStore((s) => s.importPhase);
   const importReport = useStore((s) => s.importReport);
   const setImportReport = useStore((s) => s.setImportReport);
@@ -284,7 +286,9 @@ export function DataSection() {
                   <span className="truncate text-fg-muted">{b.name}</span>
                   <span className="flex shrink-0 items-center gap-2 text-fg-faint tnum">
                     {(b.size / 1024).toFixed(1)} KB ·{" "}
-                    {new Date(b.modified * 1000).toLocaleDateString("pt-BR")}
+                    {new Date(b.modified * 1000).toLocaleDateString("en-US", {
+                      timeZone,
+                    })}
                     <button
                       className="flex items-center gap-0.5 bg-surface-2 px-1.5 py-0.5 font-semibold text-accent transition hover:bg-accent/10 disabled:opacity-40"
                       title={`Restore ${b.name}`}

@@ -15,15 +15,7 @@ import type {
   TabId,
   TrackInfo,
 } from "./lib/types";
-
-function todayISO(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Sao_Paulo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-}
+import { DEFAULT_TIME_ZONE, isValidTimeZone, todayInZone } from "./lib/types";
 
 export interface Toast {
   id: number;
@@ -196,6 +188,7 @@ const SETTING_KEY_MAP: Record<string, string> = {
   deleteAfterWatch: "delete_after_watch",
   audioLang: "audio_lang",
   subLang: "sub_lang",
+  timeZone: "time_zone",
 };
 
 const ANILIST_FIELDS = [
@@ -384,12 +377,20 @@ export const useStore = create<AppState>((set, get) => ({
     parsed.deleteAfterWatch = s.delete_after_watch === true;
     parsed.audioLang = (s.audio_lang as string) ?? "";
     parsed.subLang = (s.sub_lang as string) ?? "";
+    const storedZone = s.time_zone as string | undefined;
+    parsed.timeZone =
+      storedZone && isValidTimeZone(storedZone)
+        ? storedZone
+        : DEFAULT_TIME_ZONE;
     set({ settings: parsed });
     if (parsed.anilistSync) {
       for (const id of anilistPending.keys()) scheduleAniListPush(id, 3000);
     }
   },
   setSetting: async (key, value) => {
+    if (key === "timeZone" && !isValidTimeZone(String(value))) {
+      value = DEFAULT_TIME_ZONE;
+    }
     const settings = { ...get().settings, [key]: value };
     set({ settings });
     if (key === "anilistSync" && value === false) {
@@ -512,7 +513,12 @@ export const useStore = create<AppState>((set, get) => ({
         }
       }
       if (current && current.progress === 0 && !current.startDate) {
-        payload = { ...patch, startDate: todayISO() };
+        payload = {
+          ...patch,
+          startDate: todayInZone(
+            get().settings.timeZone ?? DEFAULT_TIME_ZONE,
+          ),
+        };
       }
     }
     const updated = await api.updateEntry(payload);

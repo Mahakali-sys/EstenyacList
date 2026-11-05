@@ -1,7 +1,12 @@
 import { Calendar, Loader2, Magnet, RotateCcw, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
-import { STATUSES, statusLabel } from "../lib/types";
+import {
+  DEFAULT_TIME_ZONE,
+  STATUSES,
+  statusLabel,
+  todayInZone,
+} from "../lib/types";
 import type { EntryView, NekoGroup, ReleaseRow } from "../lib/types";
 import { useStore } from "../store";
 import { ChipsInput } from "./ChipsInput";
@@ -11,17 +16,6 @@ import { ProgressEdit } from "./ProgressEdit";
 import { ReleaseList } from "./ReleaseList";
 import { ScorePicker } from "./ScorePicker";
 import { Btn, IconBtn, Label, useEscape } from "./ui";
-
-/// YYYY-MM-DD in the app's reference timezone (same convention as entry
-/// start dates and the activity calendar).
-function todayISO(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Sao_Paulo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-}
 
 function Section({
   label,
@@ -72,6 +66,7 @@ export function DetailSheet() {
   const removeEntry = useStore((s) => s.removeEntry);
   const removeEntryLocal = useStore((s) => s.removeEntryLocal);
   const loadSchedule = useStore((s) => s.loadSchedule);
+  const timeZone = useStore((s) => s.settings.timeZone ?? DEFAULT_TIME_ZONE);
 
   const [entry, setEntry] = useState<EntryView | null>(null);
   const [loading, setLoading] = useState(false);
@@ -379,7 +374,7 @@ export function DetailSheet() {
                         s === "COMPLETED" && !entry.finishDate
                           ? {
                               status: s,
-                              finishDate: todayISO(),
+                              finishDate: todayInZone(timeZone),
                             }
                           : { status: s },
                       )

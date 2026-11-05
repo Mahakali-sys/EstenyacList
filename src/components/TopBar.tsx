@@ -1,6 +1,7 @@
 import { ListVideo, Loader2, RefreshCw, Search } from "lucide-react";
 import { useState } from "react";
 import { api } from "../lib/api";
+import { DEFAULT_TIME_ZONE } from "../lib/types";
 import { useStore } from "../store";
 import { Btn, Kbd } from "./ui";
 
@@ -12,6 +13,7 @@ export function TopBar() {
   const toast = useStore((s) => s.toast);
   const queueCount = useStore((s) => s.queue.length);
   const setQueueOpen = useStore((s) => s.setQueueOpen);
+  const timeZone = useStore((s) => s.settings.timeZone ?? DEFAULT_TIME_ZONE);
   const [syncing, setSyncing] = useState(false);
 
   const doResync = async () => {
@@ -48,7 +50,7 @@ export function TopBar() {
             <span>
               {scheduleStatus.count} airing this week
               {scheduleStatus.lastSync
-                ? ` · synced ${new Date(scheduleStatus.lastSync * 1000).toLocaleTimeString("pt-BR")}`
+                ? ` · synced ${new Date(scheduleStatus.lastSync * 1000).toLocaleTimeString("en-US", { timeZone })}`
                 : ""}
             </span>
           </>

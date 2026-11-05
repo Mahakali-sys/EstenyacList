@@ -8,7 +8,7 @@ import { TrackersSection } from "./TrackersSection";
 type SectionId = "general" | "sync" | "trackers" | "data" | "about";
 
 const SECTIONS: { id: SectionId; label: string; sub: string }[] = [
-  { id: "general", label: "General", sub: "appearance · playback" },
+  { id: "general", label: "General", sub: "appearance · timezone · playback" },
   { id: "sync", label: "AniList", sub: "account · sync" },
   { id: "trackers", label: "Releases", sub: "trackers · filters" },
   { id: "data", label: "Data", sub: "import · backups · covers" },

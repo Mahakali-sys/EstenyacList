@@ -2,12 +2,13 @@
 
 Built from commit `{{COMMIT}}` by the release workflow on GitHub Actions.
 
-## Changes
+## Hotfix
 
-- Long anime titles no longer overflow the "Play next" button in the watch queue.
-- Playing an episode from an entry's detail sheet now closes the sheet so the player bar is visible.
-- In-app notifications no longer clip and move above the player bar while it is open.
-- Playback now uses the file's default audio and subtitle tracks. Default language preferences can be set in Settings, and the player bar can switch tracks for the current episode.
+- The app now defaults to English with US Eastern time (`America/New_York`).
+- Settings → General has a timezone picker with every IANA timezone and a filter box.
+- Airing days, airing times, and countdowns now follow the selected timezone.
+- Dates, sync timestamps, stats months, and the activity heatmap follow the selected timezone.
+- Activity days are recorded and the airing schedule is refreshed around midnight in the selected timezone.
 
 ## Assets
 

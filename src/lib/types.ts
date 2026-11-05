@@ -252,6 +252,7 @@ export interface AppSettings {
   deleteAfterWatch?: boolean;
   audioLang?: string;
   subLang?: string;
+  timeZone?: string;
 }
 
 export const STATUSES = ["CURRENT", "COMPLETED", "PAUSED", "DROPPED", "PLANNING"] as const;
@@ -317,21 +318,74 @@ export const ACCENT_PRESETS = [
   "#9c6b4f", // umber
 ];
 
+export const DEFAULT_TIME_ZONE = "America/New_York";
+
+export function isValidTimeZone(timeZone: string): boolean {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/// Every IANA timezone exposed by the host. WebView2 is Chromium-based, so
+/// supportedValuesOf is available; the fallback keeps the picker usable on
+/// older engines instead of rendering an empty list.
+export function timeZoneOptions(): string[] {
+  const supported = (
+    Intl as unknown as { supportedValuesOf?: (key: string) => string[] }
+  ).supportedValuesOf;
+  let zones: string[] = [];
+  if (typeof supported === "function") {
+    try {
+      zones = supported("timeZone");
+    } catch {
+      zones = [];
+    }
+  }
+  for (const zone of [
+    "UTC",
+    "America/New_York",
+    "America/Chicago",
+    "America/Denver",
+    "America/Los_Angeles",
+    "America/Anchorage",
+    "Pacific/Honolulu",
+    "Europe/London",
+    "Europe/Berlin",
+    "Asia/Tokyo",
+    "Australia/Sydney",
+  ]) {
+    if (!zones.includes(zone)) zones.push(zone);
+  }
+  return zones.sort((a, b) => a.localeCompare(b));
+}
+
+export function todayInZone(timeZone: string): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 export const WEEKDAYS = [
-  "domingo",
-  "segunda-feira",
-  "terça-feira",
-  "quarta-feira",
-  "quinta-feira",
-  "sexta-feira",
-  "sábado",
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
 ] as const;
 
-export function spWeekday(atSeconds: number): number {
+export function weekdayIndex(atSeconds: number, timeZone: string): number {
   // 0 = Sunday .. 6 = Saturday, matching Date.getDay()
   const s = new Date(atSeconds * 1000).toLocaleDateString("en-US", {
     weekday: "short",
-    timeZone: "Asia/Tokyo",
+    timeZone,
   });
   const map: Record<string, number> = {
     Sun: 0,
@@ -345,18 +399,22 @@ export function spWeekday(atSeconds: number): number {
   return map[s] ?? new Date(atSeconds * 1000).getDay();
 }
 
-export function spHourMinute(atSeconds: number): string {
-  return spFormat(atSeconds, {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+export function hourMinute(atSeconds: number, timeZone: string): string {
+  return formatInZone(
+    atSeconds,
+    { hour: "2-digit", minute: "2-digit", hourCycle: "h23" },
+    timeZone,
+  );
 }
 
-function spFormat(atSeconds: number, opts: Intl.DateTimeFormatOptions): string {
-  const s = new Date(atSeconds * 1000).toLocaleTimeString("pt-BR", {
+function formatInZone(
+  atSeconds: number,
+  opts: Intl.DateTimeFormatOptions,
+  timeZone: string,
+): string {
+  const s = new Date(atSeconds * 1000).toLocaleTimeString("en-US", {
     ...opts,
-    timeZone: "Asia/Tokyo",
+    timeZone,
   });
   return s.replace(/^24/, "00");
 }

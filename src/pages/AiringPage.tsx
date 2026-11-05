@@ -14,7 +14,14 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api";
 import type { EntryView, ScheduleView } from "../lib/types";
-import { WEEKDAYS, fmtCountdown, spHourMinute, spWeekday, statusLabel } from "../lib/types";
+import {
+  DEFAULT_TIME_ZONE,
+  WEEKDAYS,
+  fmtCountdown,
+  hourMinute,
+  statusLabel,
+  weekdayIndex,
+} from "../lib/types";
 import { useStore } from "../store";
 import { Cover } from "../components/Cover";
 import { IconBtn, Seg, Toggle } from "../components/ui";
@@ -24,8 +31,8 @@ const STALE_DAYS = 14;
 // survives navigating away and back within the session
 let lastAiringTab: "ANIME" | "MANGA" = "ANIME";
 
-function hourOf(atSeconds: number): string {
-  return spHourMinute(atSeconds).slice(0, 5);
+function hourOf(atSeconds: number, timeZone: string): string {
+  return hourMinute(atSeconds, timeZone).slice(0, 5);
 }
 
 function fmtCh(c: number): string {
@@ -44,6 +51,7 @@ export function AiringPage() {
   const openAnimeSheet = useStore((s) => s.openAnimeSheet);
   const openEntrySheet = useStore((s) => s.openEntrySheet);
   const autoSearch = useStore((s) => s.settings.autoSearch);
+  const timeZone = useStore((s) => s.settings.timeZone ?? DEFAULT_TIME_ZONE);
   const setSetting = useStore((s) => s.setSetting);
   const sheet = useStore((s) => s.sheet);
   const [airingTab, setAiringTabState] = useState<"ANIME" | "MANGA">(lastAiringTab);
@@ -75,22 +83,22 @@ export function AiringPage() {
 
   const grouped = useMemo(() => {
     if (!schedule) return null;
-    const today = spWeekday(now / 1000);
+    const today = weekdayIndex(now / 1000, timeZone);
     const order = Array.from({ length: 7 }, (_, i) => (today + i) % 7);
     return order.map((day) => {
       const items = schedule
-        .filter((s) => spWeekday(s.airingAt) === day)
+        .filter((s) => weekdayIndex(s.airingAt, timeZone) === day)
         .sort((a, b) => a.airingAt - b.airingAt);
       const hours: { hour: string; items: ScheduleView[] }[] = [];
       for (const item of items) {
-        const h = hourOf(item.airingAt);
+        const h = hourOf(item.airingAt, timeZone);
         const last = hours[hours.length - 1];
         if (last && last.hour === h) last.items.push(item);
         else hours.push({ hour: h, items: [item] });
       }
       return { day, label: WEEKDAYS[day], hours, count: items.length };
     });
-  }, [schedule, now]);
+  }, [schedule, now, timeZone]);
 
   const openMpv = (
     magnet: string,
@@ -190,7 +198,8 @@ export function AiringPage() {
           </h1>
           {airingTab === "ANIME" && (
             <span className="hidden font-mono text-[10px] text-fg-faint lg:inline">
-              times in JST (as announced) · auto-search ~15 min after airing
+              times in {timeZone.replace(/_/g, " ")} · auto-search ~15 min after
+              airing
             </span>
           )}
           {airingTab === "MANGA" && (

@@ -1,7 +1,11 @@
-import { Loader2, MonitorPlay, Palette } from "lucide-react";
-import { useState } from "react";
+import { Clock, Loader2, MonitorPlay, Palette } from "lucide-react";
+import { useMemo, useState } from "react";
 import { api } from "../../lib/api";
-import { ACCENT_PRESETS } from "../../lib/types";
+import {
+  ACCENT_PRESETS,
+  DEFAULT_TIME_ZONE,
+  timeZoneOptions,
+} from "../../lib/types";
 import type { ViewMode } from "../../lib/types";
 import { useStore } from "../../store";
 import { Btn, Label, Panel, Seg, Toggle } from "../../components/ui";
@@ -11,6 +15,18 @@ export function GeneralSection() {
   const setSetting = useStore((s) => s.setSetting);
   const [mpvStatus, setMpvStatus] = useState<string | null>(null);
   const [testingMpv, setTestingMpv] = useState(false);
+  const [tzFilter, setTzFilter] = useState("");
+
+  const allZones = useMemo(timeZoneOptions, []);
+  const currentZone = settings.timeZone ?? DEFAULT_TIME_ZONE;
+  const visibleZones = useMemo(() => {
+    const query = tzFilter.trim().toLowerCase().replace(/\s+/g, "_");
+    if (!query) return allZones;
+    return allZones.filter((zone) => zone.toLowerCase().includes(query));
+  }, [allZones, tzFilter]);
+  const zoneChoices = visibleZones.includes(currentZone)
+    ? visibleZones
+    : [currentZone, ...visibleZones];
 
   const testMpv = async () => {
     setTestingMpv(true);
@@ -86,6 +102,42 @@ export function GeneralSection() {
                 { id: "grid", label: "Grid (posters)" },
               ]}
             />
+          </div>
+        </div>
+      </Panel>
+
+      <Panel className="p-4">
+        <Label
+          right={<Clock size={12} strokeWidth={1.75} className="text-accent" />}
+        >
+          time &amp; region
+        </Label>
+        <div className="mt-3 grid gap-2">
+          <div>
+            <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+              timezone
+            </div>
+            <input
+              className="input mb-1.5"
+              value={tzFilter}
+              onChange={(e) => setTzFilter(e.target.value)}
+              placeholder="Filter timezones, e.g. New York or Tokyo"
+            />
+            <select
+              className="input"
+              value={currentZone}
+              onChange={(e) => setSetting("timeZone", e.target.value)}
+            >
+              {zoneChoices.map((zone) => (
+                <option key={zone} value={zone}>
+                  {zone.replace(/_/g, " ")}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="font-mono text-[9.5px] leading-relaxed text-fg-faint">
+            controls airing-day grouping, clock times, dates, and the activity
+            heatmap. defaults to America/New York (United States Eastern).
           </div>
         </div>
       </Panel>

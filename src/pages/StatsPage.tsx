@@ -15,23 +15,29 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api";
 import type { ActivityDay, EntryView } from "../lib/types";
-import { statusLabel } from "../lib/types";
+import { DEFAULT_TIME_ZONE, statusLabel, todayInZone } from "../lib/types";
 import { Bar, EmptyState, IconBtn, Label, Seg } from "../components/ui";
+import { useStore } from "../store";
 
 type Scope = "all" | "ANIME" | "MANGA";
 
 const DEFAULT_MINUTES_PER_EP = 24;
 const HEAT_WEEKS = 26;
 
-// Activity days are recorded in America/Sao_Paulo, which has no DST, so a
-// fixed offset keeps the heatmap aligned with the backend regardless of the
-// machine's timezone. Day starts are "wall-clock epochs": UTC getters on them
-// return the São Paulo calendar date.
-const SP_OFFSET_MS = -3 * 60 * 60 * 1000;
+// Activity days are calendar dates recorded by the backend in the selected
+// timezone. Treating those dates as UTC midnights keeps the heatmap aligned
+// with the calendar regardless of the machine's own timezone or DST.
 const DAY_MS = 86_400_000;
 
-function spDayStart(ms: number): number {
-  return Math.floor((ms + SP_OFFSET_MS) / DAY_MS) * DAY_MS;
+function yearMonthInZone(timeZone: string): [number, number] {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+  }).formatToParts(new Date());
+  const value = (type: string) =>
+    Number(parts.find((p) => p.type === type)?.value);
+  return [value("year"), value("month")];
 }
 
 function dayStr(dayStart: number): string {
@@ -56,6 +62,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function StatsPage() {
+  const timeZone = useStore((s) => s.settings.timeZone ?? DEFAULT_TIME_ZONE);
   const [entries, setEntries] = useState<EntryView[] | null>(null);
   const [activity, setActivity] = useState<ActivityDay[]>([]);
   const [scope, setScope] = useState<Scope>("all");
@@ -140,13 +147,15 @@ export function StatsPage() {
     const topFormats = [...formats.entries()].sort((a, b) => b[1] - a[1]);
 
     const months: { key: string; label: string; count: number }[] = [];
-    const now = new Date();
+    const [nowYear, nowMonth] = yearMonthInZone(timeZone);
     for (let i = 11; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const d = new Date(Date.UTC(nowYear, nowMonth - 1 - i, 1));
+      const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
       months.push({
         key,
-        label: d.toLocaleDateString("pt-BR", { month: "short" }).replace(".", ""),
+        label: d
+          .toLocaleDateString("en-US", { month: "short", timeZone: "UTC" })
+          .replace(".", ""),
         count: scoped.filter((e) => (e.finishDate ?? "").startsWith(key)).length,
       });
     }
@@ -185,7 +194,7 @@ export function StatsPage() {
       animeOnly: scope === "ANIME",
       mangaOnly: scope === "MANGA",
     };
-  }, [scoped]);
+  }, [scoped, timeZone]);
 
   const heat = useMemo(() => {
     const map = new Map<string, number>();
@@ -193,7 +202,7 @@ export function StatsPage() {
       if (scope !== "all" && a.mediaType !== scope) continue;
       map.set(a.day, (map.get(a.day) ?? 0) + a.count);
     }
-    const today = spDayStart(Date.now());
+    const today = Date.parse(`${todayInZone(timeZone)}T00:00:00Z`);
     const mondayOffset = (new Date(today).getUTCDay() + 6) % 7;
     const start = today - (mondayOffset + (HEAT_WEEKS - 1) * 7) * DAY_MS;
 
@@ -213,7 +222,7 @@ export function StatsPage() {
         lastMonth = monday.getUTCMonth();
         monthLabels.push(
           monday
-            .toLocaleDateString("pt-BR", { month: "short", timeZone: "UTC" })
+            .toLocaleDateString("en-US", { month: "short", timeZone: "UTC" })
             .replace(".", ""),
         );
       } else {
@@ -255,7 +264,7 @@ export function StatsPage() {
       activeDays: activeKeys.length,
       total: [...map.values()].reduce((a, b) => a + b, 0),
     };
-  }, [activity, scope]);
+  }, [activity, scope, timeZone]);
 
   const donePct = stats.total
     ? Math.round((stats.completed / stats.total) * 100)
@@ -321,7 +330,7 @@ export function StatsPage() {
                     <HeroStat
                       icon={<BookOpen size={11} strokeWidth={1.75} />}
                       label="chapters read"
-                      value={stats.chapters.toLocaleString("pt-BR")}
+                      value={stats.chapters.toLocaleString("en-US")}
                     />
                   )}
                   {!stats.mangaOnly && (
@@ -329,7 +338,7 @@ export function StatsPage() {
                       <HeroStat
                         icon={<Tv size={11} strokeWidth={1.75} />}
                         label="episodes watched"
-                        value={stats.episodes.toLocaleString("pt-BR")}
+                        value={stats.episodes.toLocaleString("en-US")}
                       />
                       <HeroStat
                         icon={<Clock size={11} strokeWidth={1.75} />}
@@ -354,7 +363,7 @@ export function StatsPage() {
                     <HeroStat
                       icon={<RotateCcw size={11} strokeWidth={1.75} />}
                       label={stats.mangaOnly ? "rereads" : "rewatches"}
-                      value={stats.rewatches.toLocaleString("pt-BR")}
+                      value={stats.rewatches.toLocaleString("en-US")}
                     />
                   )}
                 </div>
@@ -425,7 +434,7 @@ export function StatsPage() {
               </div>
               <div className="mt-2 flex items-center justify-between">
                 <span className="font-mono text-[9px] text-fg-faint tnum">
-                  {heat.total.toLocaleString("pt-BR")} units logged in{" "}
+                  {heat.total.toLocaleString("en-US")} units logged in{" "}
                   {HEAT_WEEKS} weeks
                 </span>
                 <span className="flex items-center gap-1 font-mono text-[8.5px] text-fg-faint">

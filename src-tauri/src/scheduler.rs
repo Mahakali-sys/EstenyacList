@@ -101,12 +101,12 @@ fn should_sync_schedule(state: &AppState, now: i64) -> bool {
     if now - last_sync > 20 * 3600 {
         return true;
     }
-    // refresh around 00:30 in São Paulo time
+    // refresh around 00:30 in the selected timezone
     let last_dt = chrono::DateTime::from_timestamp(last_sync, 0)
         .unwrap_or_else(|| chrono::DateTime::from_timestamp(0, 0).unwrap());
-    let today = chrono::Utc::now()
-        .with_timezone(&chrono_tz::America::Sao_Paulo);
-    let last_day = last_dt.with_timezone(&chrono_tz::America::Sao_Paulo);
+    let zone = state.db.time_zone();
+    let today = chrono::Utc::now().with_timezone(&zone);
+    let last_day = last_dt.with_timezone(&zone);
     let now_minutes = today.hour() * 60 + today.minute();
     now_minutes >= 30 && today.date_naive() != last_day.date_naive()
 }
