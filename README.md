@@ -10,6 +10,8 @@ This is not a polished product from a software company. The entire application w
 
 It works for my personal use. Treat it as experimental software. Keep backups of your database, and do not run it somewhere where a bug or data loss would be costly.
 
+Let me know of any problems, app problems, repo problems, anything. i will try to fix them.
+
 ## Screenshots
 
 <details>
