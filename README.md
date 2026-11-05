@@ -15,7 +15,7 @@ Let me know of any problems, app problems, repo problems, anything. i will try t
 ## Why did you vibecode this? Taiga already exists.
 
 IDK, i didn't like taiga, so i vibecoded my own.
-I would've forked taiga, but i didn't think of it at the time, when i remembered about it, Estenyac was already "finished".
+I would've forked taiga, but i didn't think of it at the time and when i remembered about it, Estenyac was already "finished".
 
 ## Screenshots
 
