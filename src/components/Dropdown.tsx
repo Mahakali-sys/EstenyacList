@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 export function Dropdown({
@@ -6,16 +6,26 @@ export function Dropdown({
   children,
   align = "right",
   className = "",
+  onOpenChange,
 }: {
   trigger: React.ReactNode;
   children: (close: () => void) => React.ReactNode;
   align?: "left" | "right";
   className?: string;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left?: number; right?: number } | null>(null);
+  const openChange = useRef(onOpenChange);
+  openChange.current = onOpenChange;
+
+  useEffect(() => {
+    if (!open) return;
+    openChange.current?.(true);
+    return () => openChange.current?.(false);
+  }, [open]);
 
   useLayoutEffect(() => {
     if (!open) return;

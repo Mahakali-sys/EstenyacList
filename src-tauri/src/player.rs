@@ -645,6 +645,15 @@ pub fn player_set_audio_track(id: Option<i64>) -> Result<Vec<crate::mpv_embed::T
     Ok(player.tracks())
 }
 
+/// The track menu is HTML, so it would render underneath the native video
+/// window. Free up a strip on the right while it is open.
+#[tauri::command]
+pub fn player_set_side_inset(app: tauri::AppHandle, px: f64) {
+    if let Some(win) = app.get_webview_window("main") {
+        crate::mpv_embed::set_side_inset(&win, px);
+    }
+}
+
 #[tauri::command]
 pub fn player_set_subtitle_track(
     id: Option<i64>,

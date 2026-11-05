@@ -138,6 +138,7 @@ pub fn run() {
             player::player_tracks,
             player::player_set_audio_track,
             player::player_set_subtitle_track,
+            player::player_set_side_inset,
             player::player_close,
             commands::queue_list,
             commands::queue_add,

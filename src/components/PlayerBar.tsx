@@ -19,6 +19,9 @@ import { useStore } from "../store";
 import { Dropdown } from "./Dropdown";
 import { IconBtn } from "./ui";
 
+// menu width (264px) plus the 8px gap it keeps from the window edge
+const TRACK_MENU_INSET = 272;
+
 function trackName(track: TrackInfo): string {
   const title = track.title?.trim();
   if (title) return title;
@@ -210,6 +213,12 @@ export function PlayerBar() {
       unlisten?.();
     };
   }, []);
+
+  // the video surface must take its space back if playback stops while the
+  // track menu is open (the menu unmounts without closing in that case)
+  useEffect(() => {
+    if (!player.active) void api.playerSetSideInset(0).catch(() => {});
+  }, [player.active]);
 
   // closing the player while fullscreen would leave the window with no
   // visible controls at all, so restore it when playback ends
@@ -408,6 +417,11 @@ export function PlayerBar() {
         <Dropdown
           align="right"
           className="w-[264px]"
+          onOpenChange={(open) => {
+            void api
+              .playerSetSideInset(open ? TRACK_MENU_INSET : 0)
+              .catch(() => {});
+          }}
           trigger={
             <IconBtn
               title="Audio and subtitle tracks"

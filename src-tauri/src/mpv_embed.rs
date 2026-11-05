@@ -7,7 +7,7 @@
 //! leaving a bottom strip for the in-app control bar.
 
 use std::ffi::{c_char, c_double, c_int, c_void, CStr, CString};
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Instant;
 
@@ -754,6 +754,7 @@ impl EmbeddedPlayer {
     /// Stops playback and hides the overlay. The mpv instance stays alive for
     /// the next load().
     pub fn stop_and_hide(&self) {
+        SIDE_INSET_CSS.store(0, Ordering::Relaxed);
         let _ = self.command(&["stop"]);
         stop_cursor_watch(self.hwnd);
         unsafe {
@@ -990,15 +991,26 @@ fn spawn_event_thread(
     });
 }
 
+/// Width, in CSS px, that the video window leaves free on the right so an HTML
+/// menu opened from the control bar is not painted behind it.
+static SIDE_INSET_CSS: AtomicU32 = AtomicU32::new(0);
+
+pub fn set_side_inset(window: &tauri::WebviewWindow, css_px: f64) {
+    SIDE_INSET_CSS.store(css_px.max(0.0).round() as u32, Ordering::Relaxed);
+    layout_for_window(window);
+}
+
 /// Repositions the overlay to cover the whole window client area minus the
-/// bottom control bar (h-14 = 56 CSS px, scaled). Also re-asserts the video
-/// window's z-order above the WebView2 sibling.
+/// bottom control bar (h-14 = 56 CSS px, scaled) and the side strip currently
+/// reserved for an open menu. Also re-asserts the video window's z-order above
+/// the WebView2 sibling.
 pub fn layout_for_window(window: &tauri::WebviewWindow) {
     let Some(player) = current_player() else { return };
     let scale = window.scale_factor().unwrap_or(1.0);
     let Ok(size) = window.inner_size() else { return };
     let bar = (56.0 * scale).round() as i32;
-    player.set_area(0, 0, size.width as i32, size.height as i32 - bar);
+    let inset = (SIDE_INSET_CSS.load(Ordering::Relaxed) as f64 * scale).round() as i32;
+    player.set_area(0, 0, size.width as i32 - inset, size.height as i32 - bar);
     if let Ok(h) = window.hwnd() {
         lower_webview_below(h.0 as isize, player.hwnd);
     }

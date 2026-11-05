@@ -133,6 +133,8 @@ export const api = {
     invoke<TrackInfo[]>("player_set_audio_track", { id }),
   playerSetSubtitleTrack: (id: number | null, auto = false) =>
     invoke<TrackInfo[]>("player_set_subtitle_track", { id, auto }),
+  playerSetSideInset: (px: number) =>
+    invoke<void>("player_set_side_inset", { px }),
   playerClose: () => invoke<void>("player_close"),
 
   getSettings: () => invoke<Record<string, unknown>>("get_settings"),

@@ -4,11 +4,17 @@ Built from commit `{{COMMIT}}` by the release workflow on GitHub Actions.
 
 ## Hotfix
 
+- Fixed the audio/subtitle track menu opening behind the video. The built-in player now leaves a strip on the right side of the window while the menu is open, so the track list is visible and selectable. This is a video-layer fix, not just a z-index change: a native video surface always paints over the web UI.
+
+## Dependency security fixes
+
 - Updated Vite to 7.3.7 and source-map-js to 1.2.2, closing five Dependabot advisories in the frontend build tooling (including a high-severity Windows argument-injection issue in `launch-editor`).
 - Updated rustls to 0.23.46, closing four Dependabot advisories in the TLS stack used by reqwest and rqbit.
 - The remaining Dependabot alert for `glib` covers the Linux GTK stack only. This release is a Windows build and does not compile or ship glib; the alert stays open until Tauri moves to a newer gtk-rs generation.
 
-The localization changes from 0.1.2 are unchanged:
+## Included from 0.1.2
+
+The localization changes are unchanged:
 
 - The app defaults to English with US Eastern time (`America/New_York`).
 - Settings → General has a timezone picker with every IANA timezone and a filter box.
