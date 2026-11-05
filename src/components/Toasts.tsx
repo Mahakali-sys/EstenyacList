@@ -4,9 +4,14 @@ import { useStore } from "../store";
 export function Toasts() {
   const toasts = useStore((s) => s.toasts);
   const dismiss = useStore((s) => s.dismissToast);
+  const playerActive = useStore((s) => s.player.active);
   if (toasts.length === 0) return null;
   return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-[100] flex w-[340px] flex-col gap-2">
+    <div
+      className={`pointer-events-none fixed right-4 z-[100] flex w-[340px] max-w-[calc(100vw-2rem)] flex-col gap-2 ${
+        playerActive ? "bottom-20" : "bottom-4"
+      }`}
+    >
       {toasts.map((t) => (
         <div
           key={t.id}
@@ -25,7 +30,7 @@ export function Toasts() {
           ) : (
             <Info size={14} className="mt-0.5 shrink-0 text-fg-faint" />
           )}
-          <div className="flex-1 break-words text-[11.5px] leading-relaxed text-fg-muted">
+          <div className="min-w-0 flex-1 break-words text-[11.5px] leading-relaxed text-fg-muted">
             {t.msg}
           </div>
           <button

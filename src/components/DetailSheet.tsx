@@ -245,10 +245,12 @@ export function DetailSheet() {
     api.setQualityPrefs(entry.anilistId, lowered).catch((e) => toast(String(e), "error"));
   };
 
-  const openMpv = (magnet: string, episode: number) => {
-    void useStore
+  const openMpv = async (magnet: string, episode: number) => {
+    const ok = await useStore
       .getState()
       .playerPlay(magnet, entry?.title ?? null, entry?.id ?? null, episode);
+    // the player bar sits below the sheet, so a successful play should reveal it
+    if (ok) closeSheet();
   };
 
   const queueMagnet = async (
@@ -616,7 +618,7 @@ export function DetailSheet() {
                           r.episode,
                         )
                       }
-                      onPlay={(r) => openMpv(r.magnet!, r.episode)}
+                      onPlay={(r) => void openMpv(r.magnet!, r.episode)}
                     />
                   )}
                 </Section>

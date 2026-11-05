@@ -110,9 +110,12 @@ export function QueuePanel() {
               variant="primary"
               className="w-full"
               onClick={() => void play(queue[0])}
-              icon={<Play size={13} />}
+              icon={<Play size={13} className="shrink-0" />}
+              title={`Play next — ${queue[0].title}`}
             >
-              Play next — {queue[0].title}
+              <span className="min-w-0 truncate">
+                Play next — {queue[0].title}
+              </span>
             </Btn>
             <div className="mt-2.5 flex items-center justify-between">
               <Toggle
