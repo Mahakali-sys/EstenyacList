@@ -29,4 +29,6 @@ The build is not bit-for-bit reproducible. Rebuilding the same commit can produc
 
 ## Licenses
 
-EstenyacList is licensed under the GNU General Public License, version 3 or later. The bundled libmpv is licensed under the GNU General Public License, version 2 or later. License texts and the full third-party attribution list are included in the portable ZIP and in the repository.
+EstenyacList is licensed under the GNU General Public License, version 3 or later. The bundled libmpv is a combined work distributed under the GNU General Public License, version 3 or later: mpv itself is GPL-2.0-or-later, and the DLL links FFmpeg built with `--enable-gpl --enable-version3` plus other GPL-2.0-or-later components. License texts and the full third-party attribution list, including native libraries, Rust crates, and npm packages, are included in the installer and portable ZIP and in the repository.
+
+The source for this release is commit `{{COMMIT}}`. The complete corresponding source for that commit is available from the repository owner on request.

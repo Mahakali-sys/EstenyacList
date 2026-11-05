@@ -28,9 +28,10 @@ libmpv-2.dll
 .env
 .env.*
 
-# Local debugging scripts, except the notice generator
+# Local debugging scripts, except the notice generator and native manifest
 /scripts/*
 !/scripts/generate-third-party-notices.mjs
+!/scripts/native-dependencies.json
 
 # Editors and operating system files
 .vscode/

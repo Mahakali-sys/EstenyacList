@@ -2,16 +2,163 @@
 
 EstenyacList is licensed under the GNU General Public License, version 3 or later. See [LICENSE](LICENSE).
 
-This file lists the third-party software used by the project. It covers Rust crates linked into the executable and npm packages used by the frontend. Development-only npm packages are included for completeness, even though they are not shipped in the installer.
+This file lists the third-party software used by the project. It covers the native libraries statically linked into libmpv-2.dll, Rust crates linked into the executable, and npm packages used by the frontend. Development-only npm packages are included for completeness, even though they are not shipped in the installer.
 
-## Bundled native component: mpv / libmpv
+## Bundled native components
 
-The release installer and portable build include `libmpv-2.dll` version `v0.41.0-1308-gbaa3e11d4`, built from mpv commit `baa3e11d4`.
+The release installer and portable build include `libmpv-2.dll` (122,211,840 bytes, SHA-256 `db5c52a6cab5484967a69c1554fb324966d4c4fa9f9bb2423d2f4ec19a148278`). It reports mpv `v0.41.0-1308-gbaa3e11d4` built from mpv commit `baa3e11d4`.
 
-- Project: https://github.com/mpv-player/mpv
-- Exact source commit: https://github.com/mpv-player/mpv/tree/baa3e11d4
-- Windows build scripts: https://github.com/shinchiro/mpv-winbuild-cmake
-- License: GNU General Public License, version 2 or later. The full text is in [licenses/GPL-2.0.txt](licenses/GPL-2.0.txt).
+The DLL is a combined work distributed under the GNU General Public License, version 3 or later. mpv itself is GPL-2.0-or-later, and FFmpeg is configured with `--enable-gpl --enable-version3`; the GPL-2.0-or-later codec libraries are compatible with the GPLv3. The GPL-2.0 text is in [licenses/GPL-2.0.txt](licenses/GPL-2.0.txt) and the GPL-3.0 text is in [LICENSE](LICENSE).
+
+Build attribution:
+
+- mpv source: https://github.com/mpv-player/mpv/tree/baa3e11d4
+- FFmpeg source: https://github.com/FFmpeg/FFmpeg
+- Native build scripts: https://github.com/shinchiro/mpv-winbuild-cmake/tree/1f8d2e76255abc48f0456d9be99b4cab9c6566e6 (2026-10-11)
+- Builder: https://github.com/zhongfly/mpv-winbuild
+- Reference build run: https://github.com/zhongfly/mpv-winbuild/actions/runs/40319247741
+- Binary build timestamp: 2026-10-25 00:10:58
+
+Provenance note: The binary reports mpv v0.41.0-1308-gbaa3e11d4, a 2026-10-25 build, and identifies as a zhongfly/mpv-winbuild build. Its SHA-256 does not match the published zhongfly 2026-10-25 or 2026-10-26 archives. The native component attribution uses the newest shinchiro/mpv-winbuild-cmake revision before the binary's build timestamp; the reference build run is linked for comparison.
+
+The table below lists 93 native components: 86 statically linked, 6 build-time header packages, and 1 runtime import. Version strings reported by the binary are listed where available. For components without a reported version, the exact revision depends on the build and is not recoverable from the binary alone; the upstream project is linked.
+
+<details>
+<summary>Show native component list</summary>
+
+| Component | Version / revision | License | Role | Notes | Upstream |
+| --- | --- | --- | --- | --- | --- |
+| AMF headers | not recorded | MIT | Build-time headers only | - | [source](https://github.com/GPUOpen-LibrariesAndSDKs/AMF) |
+| ANGLE headers | not recorded | BSD-3-Clause | Build-time headers only | - | [source](https://github.com/google/angle) |
+| AOM (AV1 codec) | not recorded | BSD-2-Clause | Statically linked | - | [source](https://aomedia.googlesource.com/aom) |
+| AviSynth+ headers | not recorded | GPL-2.0-or-later WITH AviSynth-linking-exception | Build-time headers only | - | [source](https://github.com/AviSynth/AviSynthPlus) |
+| brotli | not recorded | MIT | Statically linked | - | [source](https://github.com/google/brotli) |
+| bzip2 | not recorded | bzip2-1.0.6 | Statically linked | - | [source](https://gitlab.com/bzip2/bzip2) |
+| c-ares | not recorded | MIT | Statically linked | - | [source](https://github.com/c-ares/c-ares) |
+| compiler-rt builtins | not recorded | Apache-2.0 WITH LLVM-exception | Statically linked | Statically linked LLVM compiler runtime. | [source](https://github.com/llvm/llvm-project) |
+| curl | not recorded | curl | Statically linked | - | [source](https://github.com/curl/curl) |
+| dav1d | not recorded | BSD-2-Clause | Statically linked | - | [source](https://code.videolan.org/videolan/dav1d) |
+| davs2 | not recorded | GPL-2.0-or-later | Statically linked | - | [source](https://github.com/saindriches/davs2) |
+| Expat | not recorded | MIT | Statically linked | - | [source](https://github.com/libexpat/libexpat) |
+| fast_float | not recorded | Apache-2.0 OR MIT OR BSL-1.0 | Statically linked | - | [source](https://github.com/fastfloat/fast_float) |
+| FFmpeg | N-128076-g3719f257c | GPL-3.0-or-later | Statically linked | Built with --enable-gpl and --enable-version3. | [source](https://github.com/FFmpeg/FFmpeg) |
+| fontconfig | not recorded | MIT | Statically linked | - | [source](https://gitlab.freedesktop.org/fontconfig/fontconfig) |
+| FreeType | not recorded | FTL OR GPL-2.0-or-later | Statically linked | - | [source](https://github.com/freetype/freetype) |
+| FriBidi | 1.0.17 | LGPL-2.1-or-later | Statically linked | - | [source](https://github.com/fribidi/fribidi) |
+| glad | not recorded | MIT | Statically linked | - | [source](https://github.com/Dav1dde/glad) |
+| glslang | not recorded | BSD-3-Clause AND BSD-2-Clause AND MIT AND Apache-2.0 | Statically linked | - | [source](https://github.com/KhronosGroup/glslang) |
+| graphengine | not recorded | WTFPL | Statically linked | - | [source](https://github.com/sekrit-twc/graphengine) |
+| HarfBuzz | not recorded | MIT | Statically linked | - | [source](https://github.com/harfbuzz/harfbuzz) |
+| highway | not recorded | Apache-2.0 OR BSD-3-Clause | Statically linked | - | [source](https://github.com/google/highway) |
+| LAME | not recorded | LGPL-2.0-or-later | Statically linked | - | [source](https://gitlab.com/shinchiro/lame) |
+| lcms2 | not recorded | MIT | Statically linked | - | [source](https://github.com/mm2/Little-CMS) |
+| libarchive | not recorded | BSD-2-Clause (parts public domain) | Statically linked | Certain individual source files are in the public domain. | [source](https://github.com/libarchive/libarchive) |
+| libaribcaption | not recorded | MIT | Statically linked | - | [source](https://github.com/xqq/libaribcaption) |
+| libass | not recorded | ISC | Statically linked | - | [source](https://github.com/libass/libass) |
+| libbluray | 1.5.1 | LGPL-2.1-or-later | Statically linked | - | [source](https://code.videolan.org/videolan/libbluray) |
+| libbs2b | not recorded | MIT | Statically linked | - | [source](https://github.com/alexmarsev/libbs2b) |
+| libc++ | not recorded | Apache-2.0 WITH LLVM-exception | Statically linked | Statically linked LLVM C++ runtime. | [source](https://github.com/llvm/llvm-project) |
+| libc++abi | not recorded | Apache-2.0 WITH LLVM-exception | Statically linked | Statically linked LLVM C++ ABI runtime. | [source](https://github.com/llvm/llvm-project) |
+| libdvdcss | not recorded | GPL-2.0-or-later | Statically linked | - | [source](https://code.videolan.org/videolan/libdvdcss) |
+| libdvdnav | not recorded | GPL-2.0-or-later | Statically linked | - | [source](https://code.videolan.org/videolan/libdvdnav) |
+| libdvdread | not recorded | GPL-2.0-or-later | Statically linked | - | [source](https://code.videolan.org/videolan/libdvdread) |
+| libiconv | 1.18 | LGPL-2.1-or-later | Statically linked | - | [source](https://www.gnu.org/software/libiconv/) |
+| libjpeg-turbo | 3.2.1 | IJG AND BSD-3-Clause AND Zlib | Statically linked | - | [source](https://github.com/libjpeg-turbo/libjpeg-turbo) |
+| libjxl | not recorded | BSD-3-Clause | Statically linked | - | [source](https://github.com/libjxl/libjxl) |
+| libmodplug | not recorded | Public Domain | Statically linked | - | [source](https://github.com/Konstanty/libmodplug) |
+| libmysofa | not recorded | BSD-3-Clause | Statically linked | - | [source](https://github.com/hoene/libmysofa) |
+| libopenmpt | 0.7.12 | BSD-3-Clause | Statically linked | - | [source](https://lib.openmpt.org/) |
+| libplacebo | v7.387.0 (v7.360.0-246-g1532bf6-dirty) | LGPL-2.1-or-later | Statically linked | - | [source](https://github.com/haasn/libplacebo) |
+| libpng | not recorded | Libpng | Statically linked | - | [source](https://github.com/glennrp/libpng) |
+| libpsl | not recorded | MIT | Statically linked | - | [source](https://github.com/rockdaboot/libpsl) |
+| libsamplerate | not recorded | BSD-2-Clause | Statically linked | - | [source](https://github.com/libsndfile/libsamplerate) |
+| libsixel | af12e5bc6f3f69ad83479da85ddb371420da9b17 | MIT | Statically linked | - | [source](https://github.com/saitoha/libsixel) |
+| libsoxr | not recorded | LGPL-2.1-or-later | Statically linked | - | [source](https://gitlab.com/shinchiro/soxr) |
+| libsrt | not recorded | MPL-2.0 | Statically linked | - | [source](https://github.com/Haivision/srt) |
+| libssh | 0.12.0 | LGPL-2.1-or-later | Statically linked | - | [source](https://www.libssh.org/) |
+| libudfread | 1.2.0 | LGPL-2.1-or-later | Statically linked | - | [source](https://code.videolan.org/videolan/libudfread) |
+| libunibreak | not recorded | Zlib | Statically linked | - | [source](https://github.com/adah1972/libunibreak) |
+| libunwind | not recorded | Apache-2.0 WITH LLVM-exception | Statically linked | Statically linked LLVM unwinder. | [source](https://github.com/llvm/llvm-project) |
+| libva | not recorded | MIT | Statically linked | - | [source](https://github.com/intel/libva) |
+| libvpl | not recorded | MIT | Statically linked | - | [source](https://github.com/intel/libvpl) |
+| libvpx | not recorded | BSD-3-Clause | Statically linked | - | [source](https://chromium.googlesource.com/webm/libvpx) |
+| libwebp | not recorded | BSD-3-Clause | Statically linked | - | [source](https://chromium.googlesource.com/webm/libwebp) |
+| libxml2 | not recorded | MIT | Statically linked | - | [source](https://github.com/GNOME/libxml2) |
+| libzimg | not recorded | WTFPL | Statically linked | - | [source](https://github.com/sekrit-twc/zimg) |
+| libzvbi | not recorded | GPL-2.0-or-later | Statically linked | GPL-2.0-or-later, not LGPL. | [source](https://github.com/zapping-vbi/zvbi) |
+| LuaJIT | 2.1.1792728138 | MIT | Statically linked | - | [source](https://github.com/openresty/luajit2) |
+| LZO | 2.10 | GPL-2.0-or-later | Statically linked | - | [source](https://www.oberhumer.com/opensource/lzo/) |
+| MinGW-w64 CRT | not recorded | ZPL-2.1 AND BSD-3-Clause AND LGPL-2.1-or-later (parts public domain) | Statically linked | Statically linked Windows C runtime; certain parts are public domain, BSD, or LGPL. | [source](https://github.com/mingw-w64/mingw-w64) |
+| MinGW-w64 winpthreads | not recorded | MIT AND BSD-3-Clause | Statically linked | Statically linked POSIX threads runtime. | [source](https://github.com/mingw-w64/mingw-w64) |
+| mpv / libmpv | v0.41.0-1308-gbaa3e11d4 | GPL-2.0-or-later | Statically linked | - | [source](https://github.com/mpv-player/mpv) |
+| mujs | not recorded | ISC | Statically linked | - | [source](https://codeberg.org/ccxvii/mujs) |
+| nghttp2 | not recorded | MIT | Statically linked | - | [source](https://github.com/nghttp2/nghttp2) |
+| nghttp3 | not recorded | MIT | Statically linked | - | [source](https://github.com/ngtcp2/nghttp3) |
+| ngtcp2 | not recorded | MIT | Statically linked | - | [source](https://github.com/ngtcp2/ngtcp2) |
+| NV-codec headers | not recorded | MIT | Build-time headers only | - | [source](https://github.com/FFmpeg/nv-codec-headers) |
+| ogg | not recorded | BSD-3-Clause | Statically linked | - | [source](https://github.com/xiph/ogg) |
+| OpenAL Soft | not recorded | LGPL-2.0-or-later | Statically linked | - | [source](https://github.com/kcat/openal-soft) |
+| OpenSSL | not recorded | Apache-2.0 | Statically linked | - | [source](https://github.com/openssl/openssl) |
+| Opus | not recorded | BSD-3-Clause | Statically linked | - | [source](https://github.com/xiph/opus) |
+| rubberband | not recorded | GPL-2.0-or-later | Statically linked | - | [source](https://github.com/breakfastquay/rubberband) |
+| SDL2 | not recorded | Zlib | Statically linked | - | [source](https://github.com/libsdl-org/SDL) |
+| shaderc | not recorded | Apache-2.0 | Statically linked | - | [source](https://github.com/google/shaderc) |
+| Speex | not recorded | BSD-3-Clause | Statically linked | - | [source](https://github.com/xiph/speex) |
+| SPIRV-Cross | not recorded | Apache-2.0 | Statically linked | - | [source](https://github.com/KhronosGroup/SPIRV-Cross) |
+| SPIRV-Headers | not recorded | MIT | Build-time headers only | - | [source](https://github.com/KhronosGroup/SPIRV-Headers) |
+| SPIRV-Tools | not recorded | Apache-2.0 | Statically linked | - | [source](https://github.com/KhronosGroup/SPIRV-Tools) |
+| subrandr | 1.4.0 rev 8e150b0 | MPL-2.0 | Statically linked | - | [source](https://github.com/afishhh/subrandr) |
+| SVT-AV1 | not recorded | BSD-3-Clause-Clear | Statically linked | - | [source](https://gitlab.com/AOMediaCodec/SVT-AV1) |
+| uavs3d | not recorded | BSD-3-Clause | Statically linked | - | [source](https://github.com/uavs3/uavs3d) |
+| uchardet | not recorded | MPL-1.1 | Statically linked | - | [source](https://gitlab.freedesktop.org/uchardet/uchardet) |
+| VapourSynth | not recorded | LGPL-2.1-or-later | Statically linked | - | [source](https://github.com/vapoursynth/vapoursynth) |
+| Vorbis | 1.3.7 | BSD-3-Clause | Statically linked | - | [source](https://github.com/xiph/vorbis) |
+| Vulkan headers | not recorded | Apache-2.0 OR MIT | Build-time headers only | - | [source](https://github.com/KhronosGroup/Vulkan-Headers) |
+| Vulkan Loader | not recorded | Apache-2.0 | Runtime import (not bundled) | Not bundled; provided by the Vulkan runtime or graphics driver. | [source](https://github.com/KhronosGroup/Vulkan-Loader) |
+| x264 | not recorded | GPL-2.0-or-later | Statically linked | - | [source](https://code.videolan.org/videolan/x264) |
+| x265 | API 218 | GPL-2.0-or-later | Statically linked | - | [source](https://github.com/Multicorewareinc/x265) |
+| xxHash | not recorded | BSD-2-Clause | Statically linked | - | [source](https://github.com/Cyan4973/xxHash) |
+| xz / liblzma | not recorded | 0BSD | Statically linked | - | [source](https://github.com/tukaani-project/xz) |
+| zlib-ng | 1.3.2 | Zlib | Statically linked | - | [source](https://github.com/zlib-ng/zlib-ng) |
+| zstd | not recorded | BSD-3-Clause | Statically linked | - | [source](https://github.com/facebook/zstd) |
+
+</details>
+
+### Native license texts
+
+The full text of each license is included in the release under `licenses/native/`, together with `licenses/GPL-2.0.txt` and `LICENSE`.
+
+| License | File |
+| --- | --- |
+| 0BSD | [licenses/native/0BSD.txt](licenses/native/0BSD.txt) |
+| AOM | [licenses/native/AOM.txt](licenses/native/AOM.txt) |
+| Apache-2.0 | [licenses/native/Apache-2.0.txt](licenses/native/Apache-2.0.txt) |
+| AviSynth-exception | [licenses/native/AviSynth-exception.txt](licenses/native/AviSynth-exception.txt) |
+| BSD-2-Clause | [licenses/native/BSD-2-Clause.txt](licenses/native/BSD-2-Clause.txt) |
+| BSD-3-Clause | [licenses/native/BSD-3-Clause.txt](licenses/native/BSD-3-Clause.txt) |
+| BSD-3-Clause-Clear | [licenses/native/BSD-3-Clause-Clear.txt](licenses/native/BSD-3-Clause-Clear.txt) |
+| BSL-1.0 | [licenses/native/BSL-1.0.txt](licenses/native/BSL-1.0.txt) |
+| bzip2-1.0.6 | [licenses/native/bzip2-1.0.6.txt](licenses/native/bzip2-1.0.6.txt) |
+| curl | [licenses/native/curl.txt](licenses/native/curl.txt) |
+| fontconfig | [licenses/native/fontconfig.txt](licenses/native/fontconfig.txt) |
+| FTL | [licenses/native/FTL.txt](licenses/native/FTL.txt) |
+| GPL-2.0 | [licenses/GPL-2.0.txt](licenses/GPL-2.0.txt) |
+| GPL-3.0 | [LICENSE](LICENSE) |
+| HarfBuzz | [licenses/native/HarfBuzz.txt](licenses/native/HarfBuzz.txt) |
+| IJG | [licenses/native/IJG.txt](licenses/native/IJG.txt) |
+| ISC | [licenses/native/ISC.txt](licenses/native/ISC.txt) |
+| LGPL-2.0 | [licenses/native/LGPL-2.0.txt](licenses/native/LGPL-2.0.txt) |
+| LGPL-2.1 | [licenses/native/LGPL-2.1.txt](licenses/native/LGPL-2.1.txt) |
+| Libpng | [licenses/native/Libpng.txt](licenses/native/Libpng.txt) |
+| libxml2 | [licenses/native/libxml2.txt](licenses/native/libxml2.txt) |
+| LLVM-exception | [licenses/native/LLVM-exception.txt](licenses/native/LLVM-exception.txt) |
+| MIT | [licenses/native/MIT.txt](licenses/native/MIT.txt) |
+| MPL-1.1 | [licenses/native/MPL-1.1.txt](licenses/native/MPL-1.1.txt) |
+| MPL-2.0 | [licenses/native/MPL-2.0.txt](licenses/native/MPL-2.0.txt) |
+| Public-Domain | [licenses/native/Public-Domain.txt](licenses/native/Public-Domain.txt) |
+| WTFPL | [licenses/native/WTFPL.txt](licenses/native/WTFPL.txt) |
+| Zlib | [licenses/native/Zlib.txt](licenses/native/Zlib.txt) |
+| ZPL-2.1 | [licenses/native/ZPL-2.1.txt](licenses/native/ZPL-2.1.txt) |
 
 ## Rust dependencies
 
@@ -690,7 +837,7 @@ The executable links 663 Rust packages, including transitive dependencies.
 
 ## npm dependencies
 
-The frontend uses 169 npm packages, including development dependencies.
+The frontend uses 175 npm packages, including development dependencies.
 
 <details>
 <summary>Show npm dependency list</summary>
@@ -786,6 +933,12 @@ The frontend uses 169 npm packages, including development dependencies.
 | @tailwindcss/oxide-linux-x64-gnu | 4.3.3 | MIT | https://registry.npmjs.org/@tailwindcss/oxide-linux-x64-gnu/-/oxide-linux-x64-gnu-4.3.3.tgz |
 | @tailwindcss/oxide-linux-x64-musl | 4.3.3 | MIT | https://registry.npmjs.org/@tailwindcss/oxide-linux-x64-musl/-/oxide-linux-x64-musl-4.3.3.tgz |
 | @tailwindcss/oxide-wasm32-wasi | 4.3.3 | MIT | https://registry.npmjs.org/@tailwindcss/oxide-wasm32-wasi/-/oxide-wasm32-wasi-4.3.3.tgz |
+| @tailwindcss/oxide-wasm32-wasi/node_modules/@emnapi/core | 1.11.1 | MIT | https://www.npmjs.com/package/@tailwindcss/oxide-wasm32-wasi/node_modules/@emnapi/core |
+| @tailwindcss/oxide-wasm32-wasi/node_modules/@emnapi/runtime | 1.11.1 | MIT | https://www.npmjs.com/package/@tailwindcss/oxide-wasm32-wasi/node_modules/@emnapi/runtime |
+| @tailwindcss/oxide-wasm32-wasi/node_modules/@emnapi/wasi-threads | 1.2.2 | MIT | https://www.npmjs.com/package/@tailwindcss/oxide-wasm32-wasi/node_modules/@emnapi/wasi-threads |
+| @tailwindcss/oxide-wasm32-wasi/node_modules/@napi-rs/wasm-runtime | 1.1.4 | MIT | https://www.npmjs.com/package/@tailwindcss/oxide-wasm32-wasi/node_modules/@napi-rs/wasm-runtime |
+| @tailwindcss/oxide-wasm32-wasi/node_modules/@tybys/wasm-util | 0.10.2 | MIT | https://www.npmjs.com/package/@tailwindcss/oxide-wasm32-wasi/node_modules/@tybys/wasm-util |
+| @tailwindcss/oxide-wasm32-wasi/node_modules/tslib | 2.8.1 | 0BSD | https://www.npmjs.com/package/@tailwindcss/oxide-wasm32-wasi/node_modules/tslib |
 | @tailwindcss/oxide-win32-arm64-msvc | 4.3.3 | MIT | https://registry.npmjs.org/@tailwindcss/oxide-win32-arm64-msvc/-/oxide-win32-arm64-msvc-4.3.3.tgz |
 | @tailwindcss/oxide-win32-x64-msvc | 4.3.3 | MIT | https://registry.npmjs.org/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.3.3.tgz |
 | @tailwindcss/vite | 4.3.3 | MIT | https://registry.npmjs.org/@tailwindcss/vite/-/vite-4.3.3.tgz |
@@ -869,9 +1022,9 @@ The frontend uses 169 npm packages, including development dependencies.
 
 </details>
 
-## License texts
+## Rust and npm license texts
 
-The license texts below are reproduced from the dependency packages. Where a package includes multiple license files, each file is listed. If a package did not ship a license file, its declared license is shown in the tables above and the package source should be consulted.
+The Rust and npm license texts below are reproduced from the dependency packages. Where a package includes multiple license files, each file is listed. If a package did not ship a license file, its declared license is shown in the tables above and the package source should be consulted.
 
 ### Rust crate license texts
 

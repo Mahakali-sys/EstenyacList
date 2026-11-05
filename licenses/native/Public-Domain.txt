@@ -1,0 +1,24 @@
+Public-domain components
+========================
+
+Some native components bundled in libmpv-2.dll are public domain, or contain
+public-domain portions. Public-domain works are not subject to copyright and
+may be used, modified, and distributed without restriction. This note is
+provided for attribution and provenance only.
+
+- libmodplug (ModPlug-XMMS): the project states that "ModPlug-XMMS and
+  libmodplug are now in the public domain."
+  Source: https://github.com/Konstanty/libmodplug
+
+- libarchive: certain individual source files are in the public domain. The
+  rest of libarchive is distributed under the BSD 2-Clause license.
+  Source: https://github.com/libarchive/libarchive
+
+- mingw-w64: certain parts are marked as public domain. The rest of the
+  mingw-w64 runtime is distributed under the Zope Public License 2.1, with
+  some BSD-licensed portions.
+  Source: https://github.com/mingw-w64/mingw-w64
+
+- xz/liblzma: liblzma is distributed under the BSD Zero Clause License
+  (0BSD). Some of the xz documentation is also public domain or 0BSD.
+  Source: https://github.com/tukaani-project/xz

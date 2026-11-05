@@ -1,0 +1,805 @@
+{
+  "binary": {
+    "file": "libmpv-2.dll",
+    "sha256": "db5c52a6cab5484967a69c1554fb324966d4c4fa9f9bb2423d2f4ec19a148278",
+    "size": 122211840,
+    "version": "v0.41.0-1308-gbaa3e11d4",
+    "sourceCommit": "baa3e11d4",
+    "buildTimestamp": "2026-10-25T00:10:58",
+    "builder": "https://github.com/zhongfly/mpv-winbuild",
+    "buildScripts": {
+      "repository": "https://github.com/shinchiro/mpv-winbuild-cmake",
+      "commit": "1f8d2e76255abc48f0456d9be99b4cab9c6566e6",
+      "date": "2026-10-11"
+    },
+    "referenceBuildRun": "https://github.com/zhongfly/mpv-winbuild/actions/runs/40319247741",
+    "provenanceNote": "The binary reports mpv v0.41.0-1308-gbaa3e11d4, a 2026-10-25 build, and identifies as a zhongfly/mpv-winbuild build. Its SHA-256 does not match the published zhongfly 2026-10-25 or 2026-10-26 archives. The native component attribution uses the newest shinchiro/mpv-winbuild-cmake revision before the binary's build timestamp; the reference build run is linked for comparison."
+  },
+  "licenses": {
+    "0BSD": "licenses/native/0BSD.txt",
+    "AOM": "licenses/native/AOM.txt",
+    "Apache-2.0": "licenses/native/Apache-2.0.txt",
+    "AviSynth-exception": "licenses/native/AviSynth-exception.txt",
+    "BSL-1.0": "licenses/native/BSL-1.0.txt",
+    "BSD-2-Clause": "licenses/native/BSD-2-Clause.txt",
+    "BSD-3-Clause": "licenses/native/BSD-3-Clause.txt",
+    "BSD-3-Clause-Clear": "licenses/native/BSD-3-Clause-Clear.txt",
+    "bzip2-1.0.6": "licenses/native/bzip2-1.0.6.txt",
+    "curl": "licenses/native/curl.txt",
+    "fontconfig": "licenses/native/fontconfig.txt",
+    "FTL": "licenses/native/FTL.txt",
+    "GPL-2.0": "licenses/GPL-2.0.txt",
+    "GPL-3.0": "LICENSE",
+    "HarfBuzz": "licenses/native/HarfBuzz.txt",
+    "IJG": "licenses/native/IJG.txt",
+    "ISC": "licenses/native/ISC.txt",
+    "LGPL-2.0": "licenses/native/LGPL-2.0.txt",
+    "LGPL-2.1": "licenses/native/LGPL-2.1.txt",
+    "Libpng": "licenses/native/Libpng.txt",
+    "libxml2": "licenses/native/libxml2.txt",
+    "LLVM-exception": "licenses/native/LLVM-exception.txt",
+    "MIT": "licenses/native/MIT.txt",
+    "MPL-1.1": "licenses/native/MPL-1.1.txt",
+    "MPL-2.0": "licenses/native/MPL-2.0.txt",
+    "Public-Domain": "licenses/native/Public-Domain.txt",
+    "WTFPL": "licenses/native/WTFPL.txt",
+    "Zlib": "licenses/native/Zlib.txt",
+    "ZPL-2.1": "licenses/native/ZPL-2.1.txt"
+  },
+  "components": [
+    {
+      "name": "mpv / libmpv",
+      "version": "v0.41.0-1308-gbaa3e11d4",
+      "license": "GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://github.com/mpv-player/mpv",
+      "texts": ["GPL-2.0"]
+    },
+    {
+      "name": "FFmpeg",
+      "version": "N-128076-g3719f257c",
+      "license": "GPL-3.0-or-later",
+      "role": "linked",
+      "url": "https://github.com/FFmpeg/FFmpeg",
+      "texts": ["GPL-3.0"],
+      "note": "Built with --enable-gpl and --enable-version3."
+    },
+    {
+      "name": "AOM (AV1 codec)",
+      "version": "",
+      "license": "BSD-2-Clause",
+      "role": "linked",
+      "url": "https://aomedia.googlesource.com/aom",
+      "texts": ["AOM"]
+    },
+    {
+      "name": "AMF headers",
+      "version": "",
+      "license": "MIT",
+      "role": "headers",
+      "url": "https://github.com/GPUOpen-LibrariesAndSDKs/AMF",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "ANGLE headers",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "role": "headers",
+      "url": "https://github.com/google/angle",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "AviSynth+ headers",
+      "version": "",
+      "license": "GPL-2.0-or-later WITH AviSynth-linking-exception",
+      "role": "headers",
+      "url": "https://github.com/AviSynth/AviSynthPlus",
+      "texts": ["GPL-2.0", "AviSynth-exception"]
+    },
+    {
+      "name": "brotli",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/google/brotli",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "bzip2",
+      "version": "",
+      "license": "bzip2-1.0.6",
+      "role": "linked",
+      "url": "https://gitlab.com/bzip2/bzip2",
+      "texts": ["bzip2-1.0.6"]
+    },
+    {
+      "name": "c-ares",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/c-ares/c-ares",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "curl",
+      "version": "",
+      "license": "curl",
+      "role": "linked",
+      "url": "https://github.com/curl/curl",
+      "texts": ["curl"]
+    },
+    {
+      "name": "dav1d",
+      "version": "",
+      "license": "BSD-2-Clause",
+      "role": "linked",
+      "url": "https://code.videolan.org/videolan/dav1d",
+      "texts": ["BSD-2-Clause"]
+    },
+    {
+      "name": "davs2",
+      "version": "",
+      "license": "GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://github.com/saindriches/davs2",
+      "texts": ["GPL-2.0"]
+    },
+    {
+      "name": "Expat",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/libexpat/libexpat",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "fast_float",
+      "version": "",
+      "license": "Apache-2.0 OR MIT OR BSL-1.0",
+      "role": "linked",
+      "url": "https://github.com/fastfloat/fast_float",
+      "texts": ["Apache-2.0", "MIT", "BSL-1.0"]
+    },
+    {
+      "name": "fontconfig",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://gitlab.freedesktop.org/fontconfig/fontconfig",
+      "texts": ["fontconfig"]
+    },
+    {
+      "name": "FreeType",
+      "version": "",
+      "license": "FTL OR GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://github.com/freetype/freetype",
+      "texts": ["FTL", "GPL-2.0"]
+    },
+    {
+      "name": "FriBidi",
+      "version": "1.0.17",
+      "license": "LGPL-2.1-or-later",
+      "role": "linked",
+      "url": "https://github.com/fribidi/fribidi",
+      "texts": ["LGPL-2.1"]
+    },
+    {
+      "name": "glad",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/Dav1dde/glad",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "glslang",
+      "version": "",
+      "license": "BSD-3-Clause AND BSD-2-Clause AND MIT AND Apache-2.0",
+      "role": "linked",
+      "url": "https://github.com/KhronosGroup/glslang",
+      "texts": ["BSD-3-Clause", "BSD-2-Clause", "MIT", "Apache-2.0"]
+    },
+    {
+      "name": "graphengine",
+      "version": "",
+      "license": "WTFPL",
+      "role": "linked",
+      "url": "https://github.com/sekrit-twc/graphengine",
+      "texts": ["WTFPL"]
+    },
+    {
+      "name": "HarfBuzz",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/harfbuzz/harfbuzz",
+      "texts": ["HarfBuzz"]
+    },
+    {
+      "name": "highway",
+      "version": "",
+      "license": "Apache-2.0 OR BSD-3-Clause",
+      "role": "linked",
+      "url": "https://github.com/google/highway",
+      "texts": ["Apache-2.0", "BSD-3-Clause"]
+    },
+    {
+      "name": "LAME",
+      "version": "",
+      "license": "LGPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://gitlab.com/shinchiro/lame",
+      "texts": ["LGPL-2.0"]
+    },
+    {
+      "name": "lcms2",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/mm2/Little-CMS",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "libarchive",
+      "version": "",
+      "license": "BSD-2-Clause (parts public domain)",
+      "role": "linked",
+      "url": "https://github.com/libarchive/libarchive",
+      "texts": ["BSD-2-Clause", "Public-Domain"],
+      "note": "Certain individual source files are in the public domain."
+    },
+    {
+      "name": "libaribcaption",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/xqq/libaribcaption",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "libass",
+      "version": "",
+      "license": "ISC",
+      "role": "linked",
+      "url": "https://github.com/libass/libass",
+      "texts": ["ISC"]
+    },
+    {
+      "name": "libbluray",
+      "version": "1.5.1",
+      "license": "LGPL-2.1-or-later",
+      "role": "linked",
+      "url": "https://code.videolan.org/videolan/libbluray",
+      "texts": ["LGPL-2.1"]
+    },
+    {
+      "name": "libbs2b",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/alexmarsev/libbs2b",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "libc++",
+      "version": "",
+      "license": "Apache-2.0 WITH LLVM-exception",
+      "role": "linked",
+      "url": "https://github.com/llvm/llvm-project",
+      "texts": ["Apache-2.0", "LLVM-exception"],
+      "note": "Statically linked LLVM C++ runtime."
+    },
+    {
+      "name": "libc++abi",
+      "version": "",
+      "license": "Apache-2.0 WITH LLVM-exception",
+      "role": "linked",
+      "url": "https://github.com/llvm/llvm-project",
+      "texts": ["Apache-2.0", "LLVM-exception"],
+      "note": "Statically linked LLVM C++ ABI runtime."
+    },
+    {
+      "name": "libunwind",
+      "version": "",
+      "license": "Apache-2.0 WITH LLVM-exception",
+      "role": "linked",
+      "url": "https://github.com/llvm/llvm-project",
+      "texts": ["Apache-2.0", "LLVM-exception"],
+      "note": "Statically linked LLVM unwinder."
+    },
+    {
+      "name": "compiler-rt builtins",
+      "version": "",
+      "license": "Apache-2.0 WITH LLVM-exception",
+      "role": "linked",
+      "url": "https://github.com/llvm/llvm-project",
+      "texts": ["Apache-2.0", "LLVM-exception"],
+      "note": "Statically linked LLVM compiler runtime."
+    },
+    {
+      "name": "libdvdcss",
+      "version": "",
+      "license": "GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://code.videolan.org/videolan/libdvdcss",
+      "texts": ["GPL-2.0"]
+    },
+    {
+      "name": "libdvdnav",
+      "version": "",
+      "license": "GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://code.videolan.org/videolan/libdvdnav",
+      "texts": ["GPL-2.0"]
+    },
+    {
+      "name": "libdvdread",
+      "version": "",
+      "license": "GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://code.videolan.org/videolan/libdvdread",
+      "texts": ["GPL-2.0"]
+    },
+    {
+      "name": "libiconv",
+      "version": "1.18",
+      "license": "LGPL-2.1-or-later",
+      "role": "linked",
+      "url": "https://www.gnu.org/software/libiconv/",
+      "texts": ["LGPL-2.1"]
+    },
+    {
+      "name": "libjpeg-turbo",
+      "version": "3.2.1",
+      "license": "IJG AND BSD-3-Clause AND Zlib",
+      "role": "linked",
+      "url": "https://github.com/libjpeg-turbo/libjpeg-turbo",
+      "texts": ["IJG", "BSD-3-Clause", "Zlib"]
+    },
+    {
+      "name": "libjxl",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://github.com/libjxl/libjxl",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "libmodplug",
+      "version": "",
+      "license": "Public Domain",
+      "role": "linked",
+      "url": "https://github.com/Konstanty/libmodplug",
+      "texts": ["Public-Domain"]
+    },
+    {
+      "name": "libmysofa",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://github.com/hoene/libmysofa",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "libopenmpt",
+      "version": "0.7.12",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://lib.openmpt.org/",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "libplacebo",
+      "version": "v7.387.0 (v7.360.0-246-g1532bf6-dirty)",
+      "license": "LGPL-2.1-or-later",
+      "role": "linked",
+      "url": "https://github.com/haasn/libplacebo",
+      "texts": ["LGPL-2.1"]
+    },
+    {
+      "name": "libpng",
+      "version": "",
+      "license": "Libpng",
+      "role": "linked",
+      "url": "https://github.com/glennrp/libpng",
+      "texts": ["Libpng"]
+    },
+    {
+      "name": "libpsl",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/rockdaboot/libpsl",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "libsamplerate",
+      "version": "",
+      "license": "BSD-2-Clause",
+      "role": "linked",
+      "url": "https://github.com/libsndfile/libsamplerate",
+      "texts": ["BSD-2-Clause"]
+    },
+    {
+      "name": "SDL2",
+      "version": "",
+      "license": "Zlib",
+      "role": "linked",
+      "url": "https://github.com/libsdl-org/SDL",
+      "texts": ["Zlib"]
+    },
+    {
+      "name": "libsixel",
+      "version": "af12e5bc6f3f69ad83479da85ddb371420da9b17",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/saitoha/libsixel",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "libsoxr",
+      "version": "",
+      "license": "LGPL-2.1-or-later",
+      "role": "linked",
+      "url": "https://gitlab.com/shinchiro/soxr",
+      "texts": ["LGPL-2.1"]
+    },
+    {
+      "name": "libsrt",
+      "version": "",
+      "license": "MPL-2.0",
+      "role": "linked",
+      "url": "https://github.com/Haivision/srt",
+      "texts": ["MPL-2.0"]
+    },
+    {
+      "name": "libssh",
+      "version": "0.12.0",
+      "license": "LGPL-2.1-or-later",
+      "role": "linked",
+      "url": "https://www.libssh.org/",
+      "texts": ["LGPL-2.1"]
+    },
+    {
+      "name": "libudfread",
+      "version": "1.2.0",
+      "license": "LGPL-2.1-or-later",
+      "role": "linked",
+      "url": "https://code.videolan.org/videolan/libudfread",
+      "texts": ["LGPL-2.1"]
+    },
+    {
+      "name": "libunibreak",
+      "version": "",
+      "license": "Zlib",
+      "role": "linked",
+      "url": "https://github.com/adah1972/libunibreak",
+      "texts": ["Zlib"]
+    },
+    {
+      "name": "libva",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/intel/libva",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "libvpl",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/intel/libvpl",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "libvpx",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://chromium.googlesource.com/webm/libvpx",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "libwebp",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://chromium.googlesource.com/webm/libwebp",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "libxml2",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/GNOME/libxml2",
+      "texts": ["libxml2"]
+    },
+    {
+      "name": "libzimg",
+      "version": "",
+      "license": "WTFPL",
+      "role": "linked",
+      "url": "https://github.com/sekrit-twc/zimg",
+      "texts": ["WTFPL"]
+    },
+    {
+      "name": "libzvbi",
+      "version": "",
+      "license": "GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://github.com/zapping-vbi/zvbi",
+      "texts": ["GPL-2.0"],
+      "note": "GPL-2.0-or-later, not LGPL."
+    },
+    {
+      "name": "LuaJIT",
+      "version": "2.1.1792728138",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/openresty/luajit2",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "LZO",
+      "version": "2.10",
+      "license": "GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://www.oberhumer.com/opensource/lzo/",
+      "texts": ["GPL-2.0"]
+    },
+    {
+      "name": "MinGW-w64 CRT",
+      "version": "",
+      "license": "ZPL-2.1 AND BSD-3-Clause AND LGPL-2.1-or-later (parts public domain)",
+      "role": "linked",
+      "url": "https://github.com/mingw-w64/mingw-w64",
+      "texts": ["ZPL-2.1", "BSD-3-Clause", "LGPL-2.1", "Public-Domain"],
+      "note": "Statically linked Windows C runtime; certain parts are public domain, BSD, or LGPL."
+    },
+    {
+      "name": "MinGW-w64 winpthreads",
+      "version": "",
+      "license": "MIT AND BSD-3-Clause",
+      "role": "linked",
+      "url": "https://github.com/mingw-w64/mingw-w64",
+      "texts": ["MIT", "BSD-3-Clause"],
+      "note": "Statically linked POSIX threads runtime."
+    },
+    {
+      "name": "mujs",
+      "version": "",
+      "license": "ISC",
+      "role": "linked",
+      "url": "https://codeberg.org/ccxvii/mujs",
+      "texts": ["ISC"]
+    },
+    {
+      "name": "nghttp2",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/nghttp2/nghttp2",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "nghttp3",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/ngtcp2/nghttp3",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "ngtcp2",
+      "version": "",
+      "license": "MIT",
+      "role": "linked",
+      "url": "https://github.com/ngtcp2/ngtcp2",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "NV-codec headers",
+      "version": "",
+      "license": "MIT",
+      "role": "headers",
+      "url": "https://github.com/FFmpeg/nv-codec-headers",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "ogg",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://github.com/xiph/ogg",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "OpenAL Soft",
+      "version": "",
+      "license": "LGPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://github.com/kcat/openal-soft",
+      "texts": ["LGPL-2.0"]
+    },
+    {
+      "name": "OpenSSL",
+      "version": "",
+      "license": "Apache-2.0",
+      "role": "linked",
+      "url": "https://github.com/openssl/openssl",
+      "texts": ["Apache-2.0"]
+    },
+    {
+      "name": "Opus",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://github.com/xiph/opus",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "rubberband",
+      "version": "",
+      "license": "GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://github.com/breakfastquay/rubberband",
+      "texts": ["GPL-2.0"]
+    },
+    {
+      "name": "shaderc",
+      "version": "",
+      "license": "Apache-2.0",
+      "role": "linked",
+      "url": "https://github.com/google/shaderc",
+      "texts": ["Apache-2.0"]
+    },
+    {
+      "name": "SPIRV-Cross",
+      "version": "",
+      "license": "Apache-2.0",
+      "role": "linked",
+      "url": "https://github.com/KhronosGroup/SPIRV-Cross",
+      "texts": ["Apache-2.0"]
+    },
+    {
+      "name": "SPIRV-Headers",
+      "version": "",
+      "license": "MIT",
+      "role": "headers",
+      "url": "https://github.com/KhronosGroup/SPIRV-Headers",
+      "texts": ["MIT"]
+    },
+    {
+      "name": "SPIRV-Tools",
+      "version": "",
+      "license": "Apache-2.0",
+      "role": "linked",
+      "url": "https://github.com/KhronosGroup/SPIRV-Tools",
+      "texts": ["Apache-2.0"]
+    },
+    {
+      "name": "Speex",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://github.com/xiph/speex",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "subrandr",
+      "version": "1.4.0 rev 8e150b0",
+      "license": "MPL-2.0",
+      "role": "linked",
+      "url": "https://github.com/afishhh/subrandr",
+      "texts": ["MPL-2.0"]
+    },
+    {
+      "name": "SVT-AV1",
+      "version": "",
+      "license": "BSD-3-Clause-Clear",
+      "role": "linked",
+      "url": "https://gitlab.com/AOMediaCodec/SVT-AV1",
+      "texts": ["BSD-3-Clause-Clear"]
+    },
+    {
+      "name": "uavs3d",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://github.com/uavs3/uavs3d",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "uchardet",
+      "version": "",
+      "license": "MPL-1.1",
+      "role": "linked",
+      "url": "https://gitlab.freedesktop.org/uchardet/uchardet",
+      "texts": ["MPL-1.1"]
+    },
+    {
+      "name": "VapourSynth",
+      "version": "",
+      "license": "LGPL-2.1-or-later",
+      "role": "linked",
+      "url": "https://github.com/vapoursynth/vapoursynth",
+      "texts": ["LGPL-2.1"]
+    },
+    {
+      "name": "Vorbis",
+      "version": "1.3.7",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://github.com/xiph/vorbis",
+      "texts": ["BSD-3-Clause"]
+    },
+    {
+      "name": "Vulkan headers",
+      "version": "",
+      "license": "Apache-2.0 OR MIT",
+      "role": "headers",
+      "url": "https://github.com/KhronosGroup/Vulkan-Headers",
+      "texts": ["Apache-2.0", "MIT"]
+    },
+    {
+      "name": "Vulkan Loader",
+      "version": "",
+      "license": "Apache-2.0",
+      "role": "runtime",
+      "url": "https://github.com/KhronosGroup/Vulkan-Loader",
+      "texts": ["Apache-2.0"],
+      "note": "Not bundled; provided by the Vulkan runtime or graphics driver."
+    },
+    {
+      "name": "x264",
+      "version": "",
+      "license": "GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://code.videolan.org/videolan/x264",
+      "texts": ["GPL-2.0"]
+    },
+    {
+      "name": "x265",
+      "version": "API 218",
+      "license": "GPL-2.0-or-later",
+      "role": "linked",
+      "url": "https://github.com/Multicorewareinc/x265",
+      "texts": ["GPL-2.0"]
+    },
+    {
+      "name": "xxHash",
+      "version": "",
+      "license": "BSD-2-Clause",
+      "role": "linked",
+      "url": "https://github.com/Cyan4973/xxHash",
+      "texts": ["BSD-2-Clause"]
+    },
+    {
+      "name": "xz / liblzma",
+      "version": "",
+      "license": "0BSD",
+      "role": "linked",
+      "url": "https://github.com/tukaani-project/xz",
+      "texts": ["0BSD"]
+    },
+    {
+      "name": "zlib-ng",
+      "version": "1.3.2",
+      "license": "Zlib",
+      "role": "linked",
+      "url": "https://github.com/zlib-ng/zlib-ng",
+      "texts": ["Zlib"]
+    },
+    {
+      "name": "zstd",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "role": "linked",
+      "url": "https://github.com/facebook/zstd",
+      "texts": ["BSD-3-Clause"]
+    }
+  ]
+}

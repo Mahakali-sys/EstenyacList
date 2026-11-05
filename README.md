@@ -155,19 +155,23 @@ Release builds are not bit-for-bit reproducible. Building the same commit twice 
 
 The application source is licensed under the GNU General Public License, version 3 or later. See [LICENSE](LICENSE).
 
-The release installer bundles `libmpv-2.dll` version `v0.41.0-1308-gbaa3e11d4`, which is part of mpv. mpv and libmpv are licensed under the GNU General Public License, version 2 or later. The corresponding source code is available from the mpv project:
+The release installer and portable build bundle `libmpv-2.dll` version `v0.41.0-1308-gbaa3e11d4`, which is part of mpv. mpv itself is GPL-2.0-or-later. The bundled DLL is a combined work distributed under GPL-3.0-or-later because it links FFmpeg built with `--enable-gpl --enable-version3` and other GPL-2.0-or-later codec libraries. The corresponding source is available at:
 
-- https://github.com/mpv-player/mpv
-- https://github.com/mpv-player/mpv/tree/baa3e11d4
+- mpv: https://github.com/mpv-player/mpv/tree/baa3e11d4
+- FFmpeg: https://github.com/FFmpeg/FFmpeg
+- Native component list and source links: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
 
-A copy of the GPL version 2 text is included in [licenses/GPL-2.0.txt](licenses/GPL-2.0.txt). The full third-party attribution list, including Rust crates and npm packages, is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+A copy of the GPL version 2 text is in [licenses/GPL-2.0.txt](licenses/GPL-2.0.txt), and the GPL version 3 text is in [LICENSE](LICENSE). The full third-party attribution list, including native libraries, Rust crates, and npm packages, is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+Each release is built from the commit recorded in its release notes. The complete corresponding source for that commit is available from the repository owner on request.
 
 Anime and manga metadata, cover images, and screenshots of cover art belong to their respective rights holders. AniList, Nyaa, nekoBT, mpv, and the other services and projects mentioned here are not affiliated with this project.
 
 ## Repository policy
 
 This is a personal project. Issues are open for bug reports and questions. The repository is configured so that only the owner can push commits. Pull requests from other people are not accepted.
-Fell free to fork, modify and release it, its AI Generated afterall.
+
+The source is licensed under the GPLv3. You may copy, modify, and redistribute it under that license. This repository does not accept pull requests.
 
 ## Disclaimer
 

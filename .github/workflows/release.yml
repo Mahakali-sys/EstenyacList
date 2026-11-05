@@ -148,7 +148,7 @@ jobs:
           Copy-Item "src-tauri/target/release/estenyac-list.exe" "$stage/EstenyacList.exe"
           Copy-Item libmpv-2.dll $stage
           Copy-Item README.md, LICENSE, COPYRIGHT, THIRD_PARTY_NOTICES.md $stage
-          Copy-Item licenses/GPL-2.0.txt, licenses/mpv.txt "$stage/licenses"
+          Copy-Item -Recurse -Force "licenses/*" "$stage/licenses"
 
           $zip = Join-Path $assets "EstenyacList_${version}_x64-portable.zip"
           Compress-Archive -Path "$stage/*" -DestinationPath $zip -CompressionLevel Optimal

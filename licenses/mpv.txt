@@ -5,8 +5,9 @@ The EstenyacList release installer and portable build include the file
 libmpv-2.dll.
 
 Version: v0.41.0-1308-gbaa3e11d4
-Source commit: baa3e11d4
-License: GNU General Public License, version 2 or later
+mpv source commit: baa3e11d4
+Binary build timestamp: 2026-10-25 00:10:58
+SHA-256: db5c52a6cab5484967a69c1554fb324966d4c4fa9f9bb2423d2f4ec19a148278
 
 mpv is developed by the mpv project and its contributors.
 
@@ -16,13 +17,53 @@ https://github.com/mpv-player/mpv
 Exact source revision:
 https://github.com/mpv-player/mpv/tree/baa3e11d4
 
-Windows build scripts used by common mpv Windows builds:
-https://github.com/shinchiro/mpv-winbuild-cmake
 
-The full text of the GNU General Public License version 2 is included in
-licenses/GPL-2.0.txt. The EstenyacList source is licensed under the GNU
-General Public License version 3 or later; see LICENSE in the root of the
-repository.
+License
+-------
+
+mpv and libmpv are licensed under the GNU General Public License, version 2
+or later. The bundled DLL is a combined work distributed under the GNU
+General Public License, version 3 or later, because it links FFmpeg built with
+--enable-gpl --enable-version3 and other GPL-2.0-or-later components,
+including x264, x265, libdvdread, libdvdnav, libdvdcss, rubberband, davs2,
+libzvbi, and LZO. GPL-2.0-or-later code may be used under GPLv3.
+
+The full GPLv3 text is in LICENSE in the repository root. The GPLv2 text is
+in licenses/GPL-2.0.txt.
+
+The DLL also statically links permissive, LGPL, MPL, and public-domain
+libraries. The complete component list and license texts are in
+THIRD_PARTY_NOTICES.md and licenses/native/. The machine-readable component
+manifest is scripts/native-dependencies.json.
+
+
+Build and source
+----------------
+
+Builder:
+https://github.com/zhongfly/mpv-winbuild
+
+Native build scripts used for attribution:
+https://github.com/shinchiro/mpv-winbuild-cmake/tree/1f8d2e76255abc48f0456d9be99b4cab9c6566e6
+
+Reference build run:
+https://github.com/zhongfly/mpv-winbuild/actions/runs/40319247741
+
+
+Provenance note
+---------------
+
+The binary reports mpv v0.41.0-1308-gbaa3e11d4, a 2026-10-25 build, and
+identifies as a zhongfly/mpv-winbuild build. Its SHA-256 does not match the
+published zhongfly 2026-10-25 or 2026-10-26 archives. The native component
+attribution uses the newest shinchiro/mpv-winbuild-cmake revision before the
+binary's build timestamp. The exact revision of each moving-branch dependency
+is therefore inferred from the build date and the pinned build scripts; the
+upstream project links in THIRD_PARTY_NOTICES.md identify the source.
+
+
+Warranty
+--------
 
 mpv is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
