@@ -1,4 +1,6 @@
 import {
+  Check,
+  Languages,
   Loader2,
   Maximize,
   Pause,
@@ -12,8 +14,55 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { api } from "../lib/api";
+import type { TrackInfo } from "../lib/types";
 import { useStore } from "../store";
+import { Dropdown } from "./Dropdown";
 import { IconBtn } from "./ui";
+
+function trackName(track: TrackInfo): string {
+  const title = track.title?.trim();
+  if (title) return title;
+  const lang = track.lang?.trim();
+  if (lang) return lang.toUpperCase();
+  return `Track ${track.id}`;
+}
+
+function trackDetail(track: TrackInfo): string | null {
+  const parts: string[] = [];
+  if (track.lang && track.title) parts.push(track.lang);
+  if (track.codec) parts.push(track.codec);
+  if (track.default) parts.push("default");
+  if (track.external) parts.push("external");
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
+
+function TrackRow({
+  label,
+  detail,
+  selected,
+  onClick,
+}: {
+  label: string;
+  detail?: string | null;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button className={`menu-item ${selected ? "!text-accent" : ""}`} onClick={onClick}>
+      <span className="flex w-3.5 shrink-0 justify-center">
+        {selected && <Check size={12} strokeWidth={2.25} />}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate">{label}</span>
+        {detail && (
+          <span className="block truncate font-mono text-[9px] text-fg-faint">
+            {detail}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+}
 
 function fmtTime(s: number): string {
   if (!Number.isFinite(s) || s < 0) s = 0;
@@ -203,6 +252,34 @@ export function PlayerBar() {
     }
   };
 
+  const audioTracks = player.tracks.filter((t) => t.type === "audio");
+  const subTracks = player.tracks.filter((t) => t.type === "sub");
+  const subtitlesOff = !subTracks.some((t) => t.selected);
+
+  const refreshTracks = async () => {
+    try {
+      patchPlayer({ tracks: await api.playerTracks() });
+    } catch {
+      // the player may have closed while the menu was opening
+    }
+  };
+
+  const chooseAudio = async (id: number | null) => {
+    try {
+      patchPlayer({ tracks: await api.playerSetAudioTrack(id) });
+    } catch (e) {
+      useStore.getState().toast(String(e), "error");
+    }
+  };
+
+  const chooseSubtitle = async (id: number | null, auto = false) => {
+    try {
+      patchPlayer({ tracks: await api.playerSetSubtitleTrack(id, auto) });
+    } catch (e) {
+      useStore.getState().toast(String(e), "error");
+    }
+  };
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 flex h-14 items-center gap-3 border-t border-edge bg-surface px-3">
       {/* title */}
@@ -325,6 +402,63 @@ export function PlayerBar() {
             }}
           />
         </div>
+      ) : null}
+
+      {embedded && !player.resolving ? (
+        <Dropdown
+          align="right"
+          className="w-[264px]"
+          trigger={
+            <IconBtn
+              title="Audio and subtitle tracks"
+              onClick={() => void refreshTracks()}
+            >
+              <Languages size={14} strokeWidth={1.75} />
+            </IconBtn>
+          }
+        >
+          {() => (
+            <>
+              <div className="label-caps px-2.5 pb-1 pt-1">audio</div>
+              {audioTracks.map((t) => (
+                <TrackRow
+                  key={`audio-${t.id}`}
+                  label={trackName(t)}
+                  detail={trackDetail(t)}
+                  selected={t.selected}
+                  onClick={() => void chooseAudio(t.id)}
+                />
+              ))}
+              {audioTracks.length === 0 && (
+                <div className="px-2.5 py-1.5 font-mono text-[9.5px] text-fg-faint">
+                  no audio tracks reported yet
+                </div>
+              )}
+
+              <div className="my-1 border-t border-edge" />
+              <div className="label-caps px-2.5 pb-1 pt-1">subtitles</div>
+              <TrackRow
+                label="Off"
+                selected={subtitlesOff}
+                onClick={() => void chooseSubtitle(null)}
+              />
+              {subTracks.map((t) => (
+                <TrackRow
+                  key={`sub-${t.id}`}
+                  label={trackName(t)}
+                  detail={trackDetail(t)}
+                  selected={t.selected}
+                  onClick={() => void chooseSubtitle(t.id)}
+                />
+              ))}
+              {subTracks.length === 0 && (
+                <div className="px-2.5 py-1.5 font-mono text-[9.5px] text-fg-faint">
+                  no subtitle tracks reported yet
+                </div>
+              )}
+            </>
+          )}
+        </Dropdown>
       ) : null}
 
       <IconBtn

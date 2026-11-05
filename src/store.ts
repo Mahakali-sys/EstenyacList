@@ -13,6 +13,7 @@ import type {
   ScheduleStatus,
   ScheduleView,
   TabId,
+  TrackInfo,
 } from "./lib/types";
 
 function todayISO(): string {
@@ -58,6 +59,7 @@ export interface PlayerState {
   idle: boolean;
   volume: number;
   torrent: PlayerTorrent | null;
+  tracks: TrackInfo[];
 }
 
 const PLAYER_INITIAL: PlayerState = {
@@ -72,6 +74,7 @@ const PLAYER_INITIAL: PlayerState = {
   idle: true,
   volume: 60,
   torrent: null,
+  tracks: [],
 };
 
 interface AppState {
@@ -191,6 +194,8 @@ const SETTING_KEY_MAP: Record<string, string> = {
   queueAutoAdvance: "queue_auto_advance",
   streamMode: "stream_mode",
   deleteAfterWatch: "delete_after_watch",
+  audioLang: "audio_lang",
+  subLang: "sub_lang",
 };
 
 const ANILIST_FIELDS = [
@@ -377,6 +382,8 @@ export const useStore = create<AppState>((set, get) => ({
         ? "disk"
         : "ram";
     parsed.deleteAfterWatch = s.delete_after_watch === true;
+    parsed.audioLang = (s.audio_lang as string) ?? "";
+    parsed.subLang = (s.sub_lang as string) ?? "";
     set({ settings: parsed });
     if (parsed.anilistSync) {
       for (const id of anilistPending.keys()) scheduleAniListPush(id, 3000);
@@ -680,6 +687,7 @@ export const useStore = create<AppState>((set, get) => ({
         title: title ?? s.player.title,
         episode: episode ?? null,
         torrent: null,
+        tracks: [],
       },
     }));
     try {

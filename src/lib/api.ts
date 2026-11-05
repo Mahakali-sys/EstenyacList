@@ -15,6 +15,7 @@ import type {
   ReleaseRow,
   ScheduleStatus,
   ScheduleView,
+  TrackInfo,
 } from "./types";
 
 export const api = {
@@ -127,6 +128,11 @@ export const api = {
     invoke<void>("player_seek_rel", { seconds }),
   playerSetVolume: (volume: number) =>
     invoke<void>("player_set_volume", { volume }),
+  playerTracks: () => invoke<TrackInfo[]>("player_tracks"),
+  playerSetAudioTrack: (id: number | null) =>
+    invoke<TrackInfo[]>("player_set_audio_track", { id }),
+  playerSetSubtitleTrack: (id: number | null, auto = false) =>
+    invoke<TrackInfo[]>("player_set_subtitle_track", { id, auto }),
   playerClose: () => invoke<void>("player_close"),
 
   getSettings: () => invoke<Record<string, unknown>>("get_settings"),

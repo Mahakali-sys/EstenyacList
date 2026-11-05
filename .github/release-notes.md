@@ -7,6 +7,7 @@ Built from commit `{{COMMIT}}` by the release workflow on GitHub Actions.
 - Long anime titles no longer overflow the "Play next" button in the watch queue.
 - Playing an episode from an entry's detail sheet now closes the sheet so the player bar is visible.
 - In-app notifications no longer clip and move above the player bar while it is open.
+- Playback now uses the file's default audio and subtitle tracks. Default language preferences can be set in Settings, and the player bar can switch tracks for the current episode.
 
 ## Assets
 

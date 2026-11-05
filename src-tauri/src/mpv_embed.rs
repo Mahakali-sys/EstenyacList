@@ -29,6 +29,7 @@ type MpvHandle = *mut c_void;
 
 const MPV_FORMAT_STRING: c_int = 1;
 const MPV_FORMAT_FLAG: c_int = 3;
+const MPV_FORMAT_INT64: c_int = 4;
 const MPV_FORMAT_DOUBLE: c_int = 5;
 
 const MPV_EVENT_SHUTDOWN: c_int = 1;
@@ -424,6 +425,102 @@ struct PlaybackCtx {
     episode: Option<i64>,
 }
 
+#[derive(Clone, serde::Serialize)]
+pub struct TrackInfo {
+    pub id: i64,
+    #[serde(rename = "type")]
+    pub track_type: String,
+    pub lang: Option<String>,
+    pub title: Option<String>,
+    pub codec: Option<String>,
+    pub selected: bool,
+    pub default: bool,
+    pub external: bool,
+}
+
+fn get_property_string(lib: &MpvLib, handle: MpvHandle, name: &str) -> Option<String> {
+    let key = CString::new(name).ok()?;
+    let mut ptr: *mut c_char = std::ptr::null_mut();
+    unsafe {
+        if (lib.get_property)(
+            handle,
+            key.as_ptr(),
+            MPV_FORMAT_STRING,
+            &mut ptr as *mut *mut c_char as *mut c_void,
+        ) < 0
+            || ptr.is_null()
+        {
+            return None;
+        }
+        let value = CStr::from_ptr(ptr).to_string_lossy().into_owned();
+        (lib.free)(ptr as *mut c_void);
+        Some(value)
+    }
+}
+
+fn get_property_i64(lib: &MpvLib, handle: MpvHandle, name: &str) -> Option<i64> {
+    let key = CString::new(name).ok()?;
+    let mut value: i64 = 0;
+    unsafe {
+        if (lib.get_property)(
+            handle,
+            key.as_ptr(),
+            MPV_FORMAT_INT64,
+            &mut value as *mut i64 as *mut c_void,
+        ) < 0
+        {
+            return None;
+        }
+    }
+    Some(value)
+}
+
+fn get_property_flag(lib: &MpvLib, handle: MpvHandle, name: &str) -> bool {
+    let Ok(key) = CString::new(name) else {
+        return false;
+    };
+    let mut value: c_int = 0;
+    unsafe {
+        (lib.get_property)(
+            handle,
+            key.as_ptr(),
+            MPV_FORMAT_FLAG,
+            &mut value as *mut c_int as *mut c_void,
+        ) >= 0
+            && value != 0
+    }
+}
+
+/// Reads mpv's current audio and subtitle track list. Indexed properties keep
+/// this independent of the node/map FFI types and their ownership rules.
+fn read_tracks(lib: &MpvLib, handle: MpvHandle) -> Vec<TrackInfo> {
+    let count = get_property_i64(lib, handle, "track-list/count")
+        .unwrap_or(0)
+        .max(0);
+    let mut tracks = Vec::new();
+    for i in 0..count {
+        let Some(id) = get_property_i64(lib, handle, &format!("track-list/{i}/id")) else {
+            continue;
+        };
+        let track_type = get_property_string(lib, handle, &format!("track-list/{i}/type"))
+            .unwrap_or_default();
+        if track_type != "audio" && track_type != "sub" {
+            continue;
+        }
+        tracks.push(TrackInfo {
+            id,
+            track_type,
+            lang: get_property_string(lib, handle, &format!("track-list/{i}/lang")),
+            title: get_property_string(lib, handle, &format!("track-list/{i}/title")),
+            codec: get_property_string(lib, handle, &format!("track-list/{i}/codec")),
+            selected: get_property_flag(lib, handle, &format!("track-list/{i}/selected")),
+            default: get_property_flag(lib, handle, &format!("track-list/{i}/default")),
+            external: get_property_flag(lib, handle, &format!("track-list/{i}/external")),
+        });
+    }
+    tracks
+}
+
 pub struct EmbeddedPlayer {
     lib: Arc<MpvLib>,
     handle: MpvHandle,
@@ -477,10 +574,6 @@ impl EmbeddedPlayer {
                 ("force-window", "yes".into()),
                 ("idle", "yes".into()),
                 ("volume", "60".into()),
-                // pt-br subs first; falls back to mpv's default pick when the
-                // file has none. audio: japanese, else the file's default track
-                ("slang", "pt-br,brazilian,portuguese,por,pt".into()),
-                ("alang", "ja,jpn".into()),
             ];
             for (k, v) in &opts {
                 let k = CString::new(*k).unwrap();
@@ -537,6 +630,44 @@ impl EmbeddedPlayer {
             }
         }
         Ok(())
+    }
+
+    /// Resets manual track picks and applies the user's preferred language
+    /// tags before a file is loaded. Empty values clear the preference so mpv
+    /// uses the file's own defaults. Resetting aid/sid keeps a choice made for
+    /// one episode from leaking into the next one on the reused player.
+    pub fn apply_track_prefs(&self, audio: &str, subtitles: &str) {
+        for (name, value) in [
+            ("aid", "auto"),
+            ("sid", "auto"),
+            ("alang", audio),
+            ("slang", subtitles),
+        ] {
+            if let Err(e) = self.command(&["set", name, value]) {
+                log::warn!("mpv: could not set {name}: {e}");
+            }
+        }
+    }
+
+    pub fn tracks(&self) -> Vec<TrackInfo> {
+        read_tracks(&self.lib, self.handle)
+    }
+
+    pub fn set_audio_track(&self, id: Option<i64>) -> Result<(), String> {
+        match id {
+            Some(id) => self.command(&["set", "aid", &id.to_string()]),
+            None => self.command(&["set", "aid", "auto"]),
+        }
+    }
+
+    pub fn set_subtitle_track(&self, id: Option<i64>, auto: bool) -> Result<(), String> {
+        if auto {
+            return self.command(&["set", "sid", "auto"]);
+        }
+        match id {
+            Some(id) => self.command(&["set", "sid", &id.to_string()]),
+            None => self.command(&["set", "sid", "no"]),
+        }
     }
 
     pub fn load(
@@ -809,6 +940,11 @@ fn spawn_event_thread(
                             "timePos": 0.0, "duration": 0.0, "paused": paused, "idle": false,
                             "title": c.title, "entryId": c.entry_id, "episode": c.episode,
                         }),
+                    )
+                    .ok();
+                    app.emit(
+                        "player-tracks",
+                        json!({ "tracks": read_tracks(&lib, handle) }),
                     )
                     .ok();
                 }

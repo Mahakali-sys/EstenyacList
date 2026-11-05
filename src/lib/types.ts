@@ -220,6 +220,17 @@ export interface BackupInfo {
 
 export type ViewMode = "list" | "grid";
 
+export interface TrackInfo {
+  id: number;
+  type: "audio" | "sub" | string;
+  lang: string | null;
+  title: string | null;
+  codec: string | null;
+  selected: boolean;
+  default: boolean;
+  external: boolean;
+}
+
 export interface AppSettings {
   theme?: "dark" | "light";
   accent?: string;
@@ -239,6 +250,8 @@ export interface AppSettings {
   queueAutoAdvance?: boolean;
   streamMode?: "ram" | "disk";
   deleteAfterWatch?: boolean;
+  audioLang?: string;
+  subLang?: string;
 }
 
 export const STATUSES = ["CURRENT", "COMPLETED", "PAUSED", "DROPPED", "PLANNING"] as const;

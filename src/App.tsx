@@ -8,6 +8,7 @@ import { Sidebar } from "./components/Sidebar";
 import { Toasts } from "./components/Toasts";
 import { TopBar } from "./components/TopBar";
 import { api } from "./lib/api";
+import type { TrackInfo } from "./lib/types";
 import { AiringPage } from "./pages/AiringPage";
 import { ListView } from "./pages/ListView";
 import { SettingsPage } from "./pages/settings/SettingsPage";
@@ -159,6 +160,11 @@ export default function App() {
         idle: p.idle ?? false,
         ...(p.title !== undefined ? { title: p.title } : {}),
       });
+    });
+
+    on("player-tracks", (e) => {
+      const p = e.payload as { tracks?: TrackInfo[] };
+      useStore.getState().patchPlayer({ tracks: p.tracks ?? [] });
     });
 
     on("player-torrent", (e) => {

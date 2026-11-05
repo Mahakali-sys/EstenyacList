@@ -137,6 +137,40 @@ export function GeneralSection() {
         </div>
         <div className="mt-3 border-t border-edge pt-3">
           <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+            default tracks
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.08em] text-fg-faint">
+                audio language
+              </span>
+              <input
+                className="input"
+                value={settings.audioLang ?? ""}
+                onChange={(e) => setSetting("audioLang", e.target.value)}
+                placeholder="e.g. ja,jpn"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.08em] text-fg-faint">
+                subtitle language
+              </span>
+              <input
+                className="input"
+                value={settings.subLang ?? ""}
+                onChange={(e) => setSetting("subLang", e.target.value)}
+                placeholder="e.g. en,eng"
+              />
+            </label>
+          </div>
+          <div className="mt-2 font-mono text-[9.5px] leading-relaxed text-fg-faint">
+            comma-separated language tags tried in order. leave both empty to
+            use the file's default tracks. you can still switch tracks for the
+            current episode from the player bar.
+          </div>
+        </div>
+        <div className="mt-3 border-t border-edge pt-3">
+          <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
             external mpv (fallback)
           </div>
           <input
@@ -172,8 +206,8 @@ export function GeneralSection() {
           </div>
           <div className="mt-2 font-mono text-[9.5px] leading-relaxed text-fg-faint">
             the built-in player (libmpv) is used when libmpv-2.dll sits next to
-            the exe; external mpv.exe plays the same stream otherwise. subtitles
-            default to pt-br, audio to japanese, volume starts at 60%
+            the exe; external mpv.exe plays the same stream otherwise. the
+            language preferences above apply to both, volume starts at 60%
           </div>
         </div>
       </Panel>

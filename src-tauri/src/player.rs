@@ -423,8 +423,28 @@ pub async fn player_open(
     let stream_url = target.url.clone();
     let app_for_open = app.clone();
     let title_for_open = title.clone();
+    let audio_lang = app_state
+        .db
+        .settings_get("audio_lang")
+        .and_then(|v| v.as_str().map(|s| s.to_string()))
+        .unwrap_or_default();
+    let sub_lang = app_state
+        .db
+        .settings_get("sub_lang")
+        .and_then(|v| v.as_str().map(|s| s.to_string()))
+        .unwrap_or_default();
+    let audio_for_open = audio_lang.clone();
+    let sub_for_open = sub_lang.clone();
     let embedded = tauri::async_runtime::spawn_blocking(move || {
-        open_embedded(&app_for_open, &stream_url, title_for_open, entry_id, episode)
+        open_embedded(
+            &app_for_open,
+            &stream_url,
+            title_for_open,
+            entry_id,
+            episode,
+            audio_for_open,
+            sub_for_open,
+        )
     })
     .await
     .unwrap_or_else(|e| Err(format!("player task failed: {e}")));
@@ -435,7 +455,15 @@ pub async fn player_open(
         }
         Err(e) => {
             log::info!("built-in player unavailable ({e}); using external mpv");
-            if let Err(e) = open_external(&app, &app_state, &target.url, entry_id, episode) {
+            if let Err(e) = open_external(
+                &app,
+                &app_state,
+                &target.url,
+                entry_id,
+                episode,
+                &audio_lang,
+                &sub_lang,
+            ) {
                 // nothing can play this stream — stop it instead of leaving a
                 // torrent downloading in the background with no player
                 release_current(&engine, false).await;
@@ -470,6 +498,8 @@ fn open_embedded(
     title: Option<String>,
     entry_id: Option<i64>,
     episode: Option<i64>,
+    audio_lang: String,
+    sub_lang: String,
 ) -> Result<(), String> {
     let (tx, rx) = std::sync::mpsc::channel::<Result<(), String>>();
     let url = url.to_string();
@@ -496,6 +526,7 @@ fn open_embedded(
             if cancelled_in.load(Ordering::SeqCst) {
                 return Err("embedded player open cancelled".into());
             }
+            player.apply_track_prefs(&audio_lang, &sub_lang);
             player.load(&url, title, entry_id, episode)?;
             crate::mpv_embed::layout_for_window(&window);
             Ok(())
@@ -523,6 +554,8 @@ fn open_external(
     url: &str,
     entry_id: Option<i64>,
     episode: Option<i64>,
+    audio_lang: &str,
+    sub_lang: &str,
 ) -> Result<(), String> {
     let mpv_path = app_state
         .db
@@ -535,17 +568,17 @@ fn open_external(
         r"\\.\pipe\estenyac_list_{}",
         chrono::Utc::now().timestamp_millis()
     );
-    // same playback defaults as the built-in player (see mpv_embed)
-    crate::mpv::open_magnet(
-        url,
-        &mpv_path,
-        Some(&pipe),
-        &[
-            "--volume=60",
-            "--slang=pt-br,brazilian,portuguese,por,pt",
-            "--alang=ja,jpn",
-        ],
-    )?;
+    // same playback defaults as the built-in player (see mpv_embed); language
+    // preferences are only passed when the user configured them
+    let mut args: Vec<String> = vec!["--volume=60".into()];
+    if !audio_lang.trim().is_empty() {
+        args.push(format!("--alang={}", audio_lang.trim()));
+    }
+    if !sub_lang.trim().is_empty() {
+        args.push(format!("--slang={}", sub_lang.trim()));
+    }
+    let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
+    crate::mpv::open_magnet(url, &mpv_path, Some(&pipe), &arg_refs)?;
     let cancelled = crate::mpv::register_external(&pipe);
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
@@ -596,6 +629,30 @@ pub fn player_set_volume(volume: f64) -> Result<(), String> {
     crate::mpv_embed::current_player()
         .ok_or("no built-in player running")?
         .set_volume(volume)
+}
+
+#[tauri::command]
+pub fn player_tracks() -> Vec<crate::mpv_embed::TrackInfo> {
+    crate::mpv_embed::current_player()
+        .map(|p| p.tracks())
+        .unwrap_or_default()
+}
+
+#[tauri::command]
+pub fn player_set_audio_track(id: Option<i64>) -> Result<Vec<crate::mpv_embed::TrackInfo>, String> {
+    let player = crate::mpv_embed::current_player().ok_or("no built-in player running")?;
+    player.set_audio_track(id)?;
+    Ok(player.tracks())
+}
+
+#[tauri::command]
+pub fn player_set_subtitle_track(
+    id: Option<i64>,
+    auto: bool,
+) -> Result<Vec<crate::mpv_embed::TrackInfo>, String> {
+    let player = crate::mpv_embed::current_player().ok_or("no built-in player running")?;
+    player.set_subtitle_track(id, auto)?;
+    Ok(player.tracks())
 }
 
 /// Stops playback, hides the overlay and (optionally, per settings) deletes
