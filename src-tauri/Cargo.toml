@@ -1,6 +1,6 @@
 [package]
 name = "estenyac-list"
-version = "0.1.2"
+version = "0.1.3"
 description = "Portable anime & manga list manager with airing schedule and release tracking"
 license = "GPL-3.0-or-later"
 repository = "https://github.com/Mahakali-sys/EstenyacList"

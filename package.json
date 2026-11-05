@@ -1,7 +1,7 @@
 {
   "name": "estenyac-list",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Portable anime and manga list manager for Windows with AniList sync, airing schedule, release tracking, and built-in torrent streaming.",
   "license": "GPL-3.0-or-later",
   "repository": {
@@ -35,6 +35,6 @@
     "@vitejs/plugin-react": "^4.6.0",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3",
-    "vite": "^7.0.0"
+    "vite": "^7.3.7"
   }
 }

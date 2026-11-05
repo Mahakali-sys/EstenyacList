@@ -4,9 +4,15 @@ Built from commit `{{COMMIT}}` by the release workflow on GitHub Actions.
 
 ## Hotfix
 
-- The app now defaults to English with US Eastern time (`America/New_York`).
+- Updated Vite to 7.3.7 and source-map-js to 1.2.2, closing five Dependabot advisories in the frontend build tooling (including a high-severity Windows argument-injection issue in `launch-editor`).
+- Updated rustls to 0.23.46, closing four Dependabot advisories in the TLS stack used by reqwest and rqbit.
+- The remaining Dependabot alert for `glib` covers the Linux GTK stack only. This release is a Windows build and does not compile or ship glib; the alert stays open until Tauri moves to a newer gtk-rs generation.
+
+The localization changes from 0.1.2 are unchanged:
+
+- The app defaults to English with US Eastern time (`America/New_York`).
 - Settings → General has a timezone picker with every IANA timezone and a filter box.
-- Airing days, airing times, and countdowns now follow the selected timezone.
+- Airing days, airing times, and countdowns follow the selected timezone.
 - Dates, sync timestamps, stats months, and the activity heatmap follow the selected timezone.
 - Activity days are recorded and the airing schedule is refreshed around midnight in the selected timezone.
 
