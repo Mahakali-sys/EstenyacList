@@ -42,6 +42,7 @@ export function ListView({
   const entries = useStore((s) => s.entries[entriesKey] ?? EMPTY_LIST);
   const loadList = useStore((s) => s.loadList);
   const setSearchOpen = useStore((s) => s.setSearchOpen);
+  const setSearchType = useStore((s) => s.setSearchType);
   const customLists = useStore((s) => s.customLists);
   const loadCustomLists = useStore((s) => s.loadCustomLists);
   const viewMode = useStore((s) => s.settings.listView ?? "list");
@@ -302,7 +303,10 @@ export function ListView({
           <Btn
             size="sm"
             variant="primary"
-            onClick={() => setSearchOpen(true)}
+            onClick={() => {
+              setSearchType(mediaType);
+              setSearchOpen(true);
+            }}
             icon={<Plus size={12} strokeWidth={2} />}
           >
             Add {manga ? "manga" : "anime"}
@@ -375,7 +379,10 @@ export function ListView({
               <Btn
                 variant="primary"
                 size="sm"
-                onClick={() => setSearchOpen(true)}
+                onClick={() => {
+                  setSearchType(mediaType);
+                  setSearchOpen(true);
+                }}
                 icon={<Plus size={12} />}
               >
                 Add {manga ? "manga" : "anime"}

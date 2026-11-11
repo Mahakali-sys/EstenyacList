@@ -148,6 +148,8 @@ interface AppState {
 
   searchOpen: boolean;
   setSearchOpen: (open: boolean) => void;
+  searchType: "ANIME" | "MANGA";
+  setSearchType: (type: "ANIME" | "MANGA") => void;
 
   sheet: SheetState;
   openEntrySheet: (entryId: number) => void;
@@ -660,10 +662,23 @@ export const useStore = create<AppState>((set, get) => ({
 
   searchOpen: false,
   setSearchOpen: (open) => set({ searchOpen: open }),
+  searchType: "ANIME",
+  setSearchType: (searchType) => set({ searchType }),
 
   sheet: { entryId: null, anilistId: null, mediaType: "ANIME", fromSchedule: false },
-  openEntrySheet: (entryId) =>
-    set({ sheet: { entryId, anilistId: null, mediaType: "ANIME", fromSchedule: false } }),
+  openEntrySheet: (entryId) => {
+    const existing = Object.values(get().entries)
+      .flat()
+      .find((e) => e.id === entryId);
+    set({
+      sheet: {
+        entryId,
+        anilistId: null,
+        mediaType: existing?.mediaType ?? "ANIME",
+        fromSchedule: false,
+      },
+    });
+  },
   openAnimeSheet: (anilistId, mediaType, fromSchedule = false) =>
     set({ sheet: { entryId: null, anilistId, mediaType, fromSchedule } }),
   closeSheet: () => set({ sheet: { entryId: null, anilistId: null, mediaType: "ANIME", fromSchedule: false } }),

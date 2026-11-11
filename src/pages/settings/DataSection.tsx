@@ -194,8 +194,8 @@ export function DataSection() {
         )}
 
         <div className="mt-3 font-mono text-[9.5px] leading-relaxed text-fg-faint">
-          import reads your AniList export (MAL format, e.g. scrape_anilistanime.xml);
-          each entry is matched via its MAL id — rate limited (~2.3s per entry)
+          import reads AniList or MyAnimeList exports (animelist_*.xml / mangalist_*.xml);
+          anime and manga entries are matched via their MAL id — rate limited (~2.3s per entry)
         </div>
 
         {importPhase && (

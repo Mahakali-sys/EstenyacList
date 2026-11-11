@@ -12,6 +12,8 @@ src-tauri/gen/schemas/
 *.db-shm
 *.db-wal
 estenyac_backup_*.xml
+animelist_*.xml
+mangalist_*.xml
 estenyac_search.log
 cache/
 scrape_anilist*.xml

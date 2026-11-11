@@ -71,7 +71,7 @@ pub async fn add_entry(
         .and_then(|c| c.get("large"))
         .and_then(|c| c.as_str())
         .map(|s| s.to_string());
-    crate::images::ensure_cover(&db, anilist_id, cover.as_deref()).await;
+    crate::images::ensure_cover(&db, anilist_id, &media_type, cover.as_deref()).await;
     db.entry_get(id).ok_or_else(|| "entry missing after add".into())
 }
 
@@ -323,11 +323,13 @@ async fn cache_missing_covers(db: Arc<crate::db::Db>, app: Option<&AppHandle>) -
         return 0;
     };
     let mut done = 0usize;
-    for (i, (anilist_id, url)) in jobs.into_iter().enumerate() {
-        if crate::images::file_for(anilist_id).exists() {
+    for (i, (anilist_id, url, media_type)) in jobs.into_iter().enumerate() {
+        if crate::images::file_for(anilist_id, &media_type).exists()
+            || crate::images::find_file(anilist_id).is_some()
+        {
             done += 1;
         } else if let Some(bytes) = crate::images::fetch_bytes(client, &url).await {
-            if crate::images::store_cover_bytes(&db, anilist_id, &bytes).is_some() {
+            if crate::images::store_cover_bytes(&db, anilist_id, &media_type, &bytes).is_some() {
                 done += 1;
             }
         }

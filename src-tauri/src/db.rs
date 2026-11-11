@@ -989,20 +989,26 @@ impl Db {
         rows.filter_map(|r| r.ok()).collect()
     }
 
-    /// anilist ids + cover URLs for entries on the user's lists, used to
-    /// re-populate the cover cache after it was cleared or deleted.
-    pub fn covers_to_cache(&self) -> Vec<(i64, String)> {
+    /// anilist ids, cover URLs and media types for entries on the user's lists,
+    /// used to re-populate the cover cache after it was cleared or deleted.
+    pub fn covers_to_cache(&self) -> Vec<(i64, String, String)> {
         let c = self.conn();
         let mut st = c
             .prepare(
-                "SELECT e.anilist_id, m.cover_url
+                "SELECT e.anilist_id, m.cover_url, m.type
                  FROM entries e JOIN media m ON m.anilist_id = e.anilist_id
                  WHERE m.cover_url IS NOT NULL AND m.cover_url != ''
                  GROUP BY e.anilist_id",
             )
             .unwrap();
         let rows = st
-            .query_map([], |r| Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?)))
+            .query_map([], |r| {
+                Ok((
+                    r.get::<_, i64>(0)?,
+                    r.get::<_, String>(1)?,
+                    r.get::<_, String>(2)?,
+                ))
+            })
             .unwrap();
         rows.filter_map(|r| r.ok()).collect()
     }

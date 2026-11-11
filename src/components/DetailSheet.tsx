@@ -88,7 +88,14 @@ export function DetailSheet() {
   useEscape(open, closeSheet);
 
   const isEntrySheet = sheet.entryId != null;
-  const manga = sheet.mediaType === "MANGA";
+  // The entry itself is authoritative once loaded; openEntrySheet cannot know
+  // the media type when it only receives an id. Ignore a stale entry while a
+  // different one is loading.
+  const entryMatches = entry != null && entry.id === sheet.entryId;
+  const manga =
+    (entry != null && entry.id === sheet.entryId
+      ? entry.mediaType
+      : sheet.mediaType) === "MANGA";
 
   useEffect(() => {
     loadCustomLists();
@@ -306,7 +313,7 @@ export function DetailSheet() {
           </div>
         )}
 
-        {!loading && isEntrySheet && entry && (
+        {!loading && isEntrySheet && entryMatches && entry && (
           <div className="flex-1 overflow-y-auto px-4 pb-6">
             <div className="flex gap-4 pt-4">
               <Cover
@@ -498,7 +505,11 @@ export function DetailSheet() {
                 className="input"
                 rows={3}
                 defaultValue={entry.notes}
-                placeholder="episode thoughts, where you left off, etc."
+                placeholder={
+                  manga
+                    ? "reading thoughts, where you left off, etc."
+                    : "episode thoughts, where you left off, etc."
+                }
                 onBlur={(e) => {
                   if (e.target.value !== entry.notes) patch({ notes: e.target.value });
                 }}

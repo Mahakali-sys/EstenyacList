@@ -20,7 +20,8 @@ export function SearchOverlay() {
   const openEntrySheet = useStore((s) => s.openEntrySheet);
 
   const [q, setQ] = useState("");
-  const [type, setType] = useState<"ANIME" | "MANGA">("ANIME");
+  const type = useStore((s) => s.searchType);
+  const setType = useStore((s) => s.setSearchType);
   const [results, setResults] = useState<MediaSummary[]>([]);
   const [localResults, setLocalResults] = useState<EntryView[]>([]);
   const [searching, setSearching] = useState(false);

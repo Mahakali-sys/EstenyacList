@@ -72,9 +72,9 @@ Nyaa and nekoBT configuration, saved title filters, quality preferences, fansub 
 
 - Anime and manga lists with watching, reading, completed, paused, dropped, and plan-to-watch statuses.
 - Unlimited custom lists, separate for anime and manga.
-- Scores with three emoji ratings: good, mid, and bad. Notes, start and finish dates, rewatches, and progress tracking are included.
+- Scores with four tiers: bad, mid, good, and very good. Notes, start and finish dates, rewatches, and progress tracking are included.
 - AniList search and metadata, plus optional AniList account sync with manual pull and automatic push.
-- Weekly airing schedule in Japan Standard Time, grouped by day and hour, with countdowns to the next episode.
+- Weekly airing schedule with countdowns, grouped by day and hour in your selected timezone.
 - Automatic release checks roughly 15 minutes after an episode airs, using Nyaa's RSS feed and the nekoBT API.
 - Tracker strategy selection: Nyaa only, nekoBT only, or smart mode that queries both and picks the result with the most seeders.
 - Saved release filters for required and excluded words, quality preferences, preferred fansub groups, and blocked groups.
@@ -84,7 +84,7 @@ Nyaa and nekoBT configuration, saved title filters, quality preferences, fansub 
 - Watch queue with drag-to-reorder and optional auto-advance after each episode.
 - Progress is updated automatically when an episode finishes.
 - Statistics page with watch time, completion, activity heatmap, score histogram, and format breakdown.
-- MAL-compatible XML import and export, plus rolling monthly backups stored next to the database.
+- MAL-compatible XML import and export for anime and manga, plus rolling monthly backups stored next to the database.
 - Cover images cached locally as JPEG XL for entries on your lists only.
 - Portable data. The database, backups, cache, and logs live next to the executable.
 - Dark and light themes, ten accent presets, and a custom accent color picker.
@@ -108,7 +108,7 @@ The build is not code-signed. Windows SmartScreen may show a warning on first la
 Everything is stored next to `EstenyacList.exe`:
 
 - `estenyac_list.db`: the SQLite database with your lists, settings, schedule, and cached metadata.
-- `cache/images`: cached cover images.
+- `cache/images/anime` and `cache/images/manga`: cached cover images, separated by media type.
 - `cache/torrents`: temporary torrent data when disk mode is enabled.
 - `estenyac_backup_YYYYMM.xml`: rolling monthly MAL-format backups, up to six months.
 - `estenyac_search.log`: release search diagnostics.

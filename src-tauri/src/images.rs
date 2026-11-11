@@ -13,12 +13,49 @@ const QUALITY_SETTING: &str = "cover_jxl_quality";
 // quality so the second lossy generation stays visually identical.
 const JPEG_REENCODE_QUALITY: u8 = 92;
 
-pub fn file_for(id: i64) -> PathBuf {
-    crate::db::cache_dir().join(format!("{id}.jxl"))
+fn media_dir(media_type: &str) -> PathBuf {
+    let sub = if media_type.eq_ignore_ascii_case("MANGA") {
+        "manga"
+    } else {
+        "anime"
+    };
+    crate::db::cache_dir().join(sub)
 }
 
-fn legacy_file_for(id: i64) -> PathBuf {
-    crate::db::cache_dir().join(format!("{id}.jpg"))
+/// Cached cover path for one media type. Anime and manga each get their own
+/// directory so the cache stays browsable by hand.
+pub fn file_for(id: i64, media_type: &str) -> PathBuf {
+    media_dir(media_type).join(format!("{id}.jxl"))
+}
+
+fn legacy_file_for(id: i64, media_type: &str) -> PathBuf {
+    media_dir(media_type).join(format!("{id}.jpg"))
+}
+
+fn root_file_for(id: i64, extension: &str) -> PathBuf {
+    crate::db::cache_dir().join(format!("{id}.{extension}"))
+}
+
+/// Finds a cover in either typed directory, then in the pre-v0.1.4 flat cache.
+pub fn find_file(id: i64) -> Option<PathBuf> {
+    for media_type in ["ANIME", "MANGA"] {
+        for path in [file_for(id, media_type), legacy_file_for(id, media_type)] {
+            if path.exists() {
+                return Some(path);
+            }
+        }
+    }
+    for path in [root_file_for(id, "jxl"), root_file_for(id, "jpg")] {
+        if path.exists() {
+            return Some(path);
+        }
+    }
+    None
+}
+
+pub fn media_type_for(db: &Db, id: i64) -> Option<String> {
+    db.media_get(id)
+        .and_then(|m| m.get("type").and_then(|t| t.as_str()).map(|s| s.to_string()))
 }
 
 pub fn delete_cache() -> std::io::Result<()> {
@@ -65,71 +102,110 @@ fn encode_jxl(width: usize, height: usize, rgb: &[u8]) -> Option<Vec<u8>> {
 }
 
 // Converts cached JPEG bytes into a .jxl file. Returns the new path on success.
-fn store_jpeg_as_jxl(db: &Db, anilist_id: i64, jpeg: &[u8]) -> Option<String> {
+fn store_jpeg_as_jxl(
+    db: &Db,
+    anilist_id: i64,
+    media_type: &str,
+    jpeg: &[u8],
+) -> Option<String> {
     let (width, height, rgb) = jpeg_to_rgb(jpeg)?;
     let jxl = encode_jxl(width, height, &rgb)?;
-    let file = file_for(anilist_id);
+    let file = file_for(anilist_id, media_type);
     if let Some(dir) = file.parent() {
         let _ = std::fs::create_dir_all(dir);
     }
-    std::fs::write(&file, &jxl).ok()?;
-    // original no longer needed once the JXL is on disk
-    let _ = std::fs::remove_file(legacy_file_for(anilist_id));
+    if !write_atomic(&file, &jxl) {
+        return None;
+    }
+    // originals are no longer needed once the JXL is on disk
+    let _ = std::fs::remove_file(legacy_file_for(anilist_id, media_type));
+    let _ = std::fs::remove_file(root_file_for(anilist_id, "jpg"));
+    let _ = std::fs::remove_file(root_file_for(anilist_id, "jxl"));
     let path = file.to_string_lossy().to_string();
     db.media_set_cover_file(anilist_id, &path);
     Some(path)
 }
 
-// Converts a legacy cached .jpg over to .jxl. Ok(true) = converted,
-// Ok(false) = nothing to do, Err(reason) = failed and will be retried.
-fn convert_legacy(db: &Db, anilist_id: i64) -> Result<bool, String> {
-    let jxl = file_for(anilist_id);
-    let legacy = legacy_file_for(anilist_id);
-    if jxl.exists() {
-        let _ = std::fs::remove_file(&legacy);
+// Converts a legacy cached .jpg (or moves a flat-cache .jxl) into the typed
+// directory. Ok(true) = converted, Ok(false) = nothing to do,
+// Err(reason) = failed and will be retried on the next launch.
+fn convert_legacy(db: &Db, anilist_id: i64, media_type: &str) -> Result<bool, String> {
+    let target = file_for(anilist_id, media_type);
+    let sources = [
+        legacy_file_for(anilist_id, media_type),
+        root_file_for(anilist_id, "jpg"),
+        root_file_for(anilist_id, "jxl"),
+    ];
+    if target.exists() {
+        for source in sources {
+            if source != target {
+                let _ = std::fs::remove_file(source);
+            }
+        }
         return Ok(false);
     }
-    if !legacy.exists() {
+    let Some(source) = sources.iter().find(|p| p.exists()).cloned() else {
         return Ok(false);
-    }
-    let bytes =
-        std::fs::read(&legacy).map_err(|e| format!("cannot read file: {e}"))?;
+    };
+    let bytes = std::fs::read(&source)
+        .map_err(|e| format!("cannot read {}: {e}", source.display()))?;
     if is_jxl(&bytes) {
-        let _ = std::fs::rename(&legacy, &jxl);
-        let path = jxl.to_string_lossy().to_string();
-        db.media_set_cover_file(anilist_id, &path);
-        return Ok(true);
+        if let Some(dir) = target.parent() {
+            let _ = std::fs::create_dir_all(dir);
+        }
+        std::fs::rename(&source, &target)
+            .map_err(|e| format!("cannot move {}: {e}", source.display()))?;
+    } else {
+        let (width, height, rgb) = jpeg_to_rgb(&bytes).ok_or_else(|| {
+            "not a decodable JPEG (non-JPEG bytes stored via fallback, or corrupt file)"
+                .to_string()
+        })?;
+        let jxl_bytes = encode_jxl(width, height, &rgb)
+            .ok_or_else(|| "JXL encoder rejected the image".to_string())?;
+        if let Some(dir) = target.parent() {
+            let _ = std::fs::create_dir_all(dir);
+        }
+        if !write_atomic(&target, &jxl_bytes) {
+            return Err(format!("cannot write {}", target.display()));
+        }
+        let _ = std::fs::remove_file(&source);
     }
-    let (width, height, rgb) = jpeg_to_rgb(&bytes)
-        .ok_or_else(|| "not a decodable JPEG (non-JPEG bytes stored via fallback, or corrupt file)".to_string())?;
-    let jxl_bytes = encode_jxl(width, height, &rgb)
-        .ok_or_else(|| "JXL encoder rejected the image".to_string())?;
-    if let Some(dir) = jxl.parent() {
-        let _ = std::fs::create_dir_all(dir);
-    }
-    std::fs::write(&jxl, &jxl_bytes)
-        .map_err(|e| format!("cannot write .jxl: {e}"))?;
-    let _ = std::fs::remove_file(&legacy);
-    let path = jxl.to_string_lossy().to_string();
+    let path = target.to_string_lossy().to_string();
     db.media_set_cover_file(anilist_id, &path);
     Ok(true)
 }
 
-// One-time-ish migration: converts every cached .jpg cover to JPEG XL.
-// Runs on every startup, so anything that failed (or was interrupted)
-// is retried automatically.
+// One-time-ish migration: moves flat-cache covers into anime/ and manga/,
+// and converts every cached .jpg cover to JPEG XL. Runs on every startup, so
+// anything that failed (or was interrupted) is retried automatically.
 pub fn migrate_legacy_covers(db: &Db) {
     let dir = crate::db::cache_dir();
-    let Ok(entries) = std::fs::read_dir(&dir) else {
-        return;
-    };
+    let mut files = Vec::new();
+    if let Ok(entries) = std::fs::read_dir(&dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                files.push(path);
+            }
+        }
+    }
+    for media_type in ["ANIME", "MANGA"] {
+        if let Ok(entries) = std::fs::read_dir(media_dir(media_type)) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_file() {
+                    files.push(path);
+                }
+            }
+        }
+    }
+
     let mut converted = 0usize;
     let mut failed = 0usize;
     let mut skipped = 0usize;
-    for entry in entries.flatten() {
-        let path = entry.path();
-        if !path.is_file() || path.extension().and_then(|e| e.to_str()) != Some("jpg")
-        {
+    for path in files {
+        let extension = path.extension().and_then(|e| e.to_str());
+        if extension != Some("jpg") && extension != Some("jxl") {
             continue;
         }
         let Some(stem) = path.file_stem().and_then(|s| s.to_str()) else {
@@ -138,17 +214,19 @@ pub fn migrate_legacy_covers(db: &Db) {
         let Ok(anilist_id) = stem.parse::<i64>() else {
             continue;
         };
-        if file_for(anilist_id).exists() {
-            let _ = std::fs::remove_file(&path);
+        let Some(media_type) = media_type_for(db, anilist_id) else {
+            continue;
+        };
+        if path == file_for(anilist_id, &media_type) {
             skipped += 1;
             continue;
         }
         let start = std::time::Instant::now();
-        match convert_legacy(db, anilist_id) {
+        match convert_legacy(db, anilist_id, &media_type) {
             Ok(true) => {
                 converted += 1;
                 crate::db::append_log(&format!(
-                    "cover {anilist_id}: jpg -> jxl in {:?}",
+                    "cover {anilist_id} ({media_type}): moved/encoded in {:?}",
                     start.elapsed()
                 ));
             }
@@ -156,7 +234,7 @@ pub fn migrate_legacy_covers(db: &Db) {
             Err(reason) => {
                 failed += 1;
                 crate::db::append_log(&format!(
-                    "cover {anilist_id}: conversion failed - {reason}"
+                    "cover {anilist_id} ({media_type}): conversion failed - {reason}"
                 ));
             }
         }
@@ -184,10 +262,18 @@ pub fn http_client() -> Option<&'static reqwest::Client> {
 
 // Downloads a cover at a decent resolution (AniList "large" ~ 230px wide, ~30-60KB).
 // Kept below "extraLarge" to avoid downloading/requesting unnecessary data.
-pub async fn ensure_cover(db: &Db, anilist_id: i64, cover_url: Option<&str>) -> String {
-    let file = file_for(anilist_id);
+pub async fn ensure_cover(
+    db: &Db,
+    anilist_id: i64,
+    media_type: &str,
+    cover_url: Option<&str>,
+) -> String {
+    let file = file_for(anilist_id, media_type);
     if file.exists() {
         return file.to_string_lossy().to_string();
+    }
+    if let Some(existing) = find_file(anilist_id) {
+        return existing.to_string_lossy().to_string();
     }
     let Some(url) = cover_url else { return String::new() };
     if url.is_empty() {
@@ -197,7 +283,7 @@ pub async fn ensure_cover(db: &Db, anilist_id: i64, cover_url: Option<&str>) -> 
         return String::new();
     };
     if let Some(bytes) = fetch_bytes(client, url).await {
-        if let Some(path) = store_cover_bytes(db, anilist_id, &bytes) {
+        if let Some(path) = store_cover_bytes(db, anilist_id, media_type, &bytes) {
             return path;
         }
     }
@@ -244,23 +330,47 @@ pub async fn reencode_covers_for_quality(db: std::sync::Arc<Db>) {
     if saved == Some(true) {
         return;
     }
-    let dir = crate::db::cache_dir();
-    let ids: Vec<i64> = match std::fs::read_dir(&dir) {
-        Ok(entries) => entries
-            .flatten()
-            .filter_map(|e| {
-                let p = e.path();
-                if p.extension().and_then(|x| x.to_str()) == Some("jxl") {
-                    p.file_stem()
-                        .and_then(|s| s.to_str())
-                        .and_then(|s| s.parse::<i64>().ok())
-                } else {
-                    None
+    let mut ids: Vec<(i64, String)> = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    for media_type in ["ANIME", "MANGA"] {
+        if let Ok(entries) = std::fs::read_dir(media_dir(media_type)) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.extension().and_then(|x| x.to_str()) != Some("jxl") {
+                    continue;
                 }
-            })
-            .collect(),
-        Err(_) => Vec::new(),
-    };
+                if let Some(id) = path
+                    .file_stem()
+                    .and_then(|s| s.to_str())
+                    .and_then(|s| s.parse::<i64>().ok())
+                {
+                    if seen.insert(id) {
+                        ids.push((id, media_type.to_string()));
+                    }
+                }
+            }
+        }
+    }
+    // flat-cache covers (pre-v0.1.4) may still exist if migration was skipped
+    if let Ok(entries) = std::fs::read_dir(crate::db::cache_dir()) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|x| x.to_str()) != Some("jxl") {
+                continue;
+            }
+            let Some(id) = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .and_then(|s| s.parse::<i64>().ok())
+            else {
+                continue;
+            };
+            if seen.insert(id) {
+                let media_type = media_type_for(&db, id).unwrap_or_else(|| "ANIME".into());
+                ids.push((id, media_type));
+            }
+        }
+    }
     db.settings_set(QUALITY_SETTING, &serde_json::json!(JXL_QUALITY as f64));
     if ids.is_empty() {
         return;
@@ -274,7 +384,7 @@ pub async fn reencode_covers_for_quality(db: std::sync::Arc<Db>) {
         return;
     };
     let mut done = 0usize;
-    for id in &ids {
+    for (id, media_type) in &ids {
         let fresh = match db
             .media_get(*id)
             .and_then(|m| {
@@ -295,15 +405,23 @@ pub async fn reencode_covers_for_quality(db: std::sync::Arc<Db>) {
             Some((w, h, rgb)) => encode_jxl(w, h, &rgb),
             None => {
                 // fallback: current pixels, no additional quality loss beyond q80
-                let path = file_for(*id);
-                std::fs::read(&path).ok().and_then(|b| {
-                    jxl_to_rgb(&b).and_then(|(w, h, rgb)| encode_jxl(w, h, &rgb))
+                find_file(*id).and_then(|path| {
+                    let bytes = std::fs::read(path).ok()?;
+                    if is_jxl(&bytes) {
+                        jxl_to_rgb(&bytes)
+                    } else {
+                        jpeg_to_rgb(&bytes)
+                    }
+                    .and_then(|(w, h, rgb)| encode_jxl(w, h, &rgb))
                 })
             }
         };
         if let Some(data) = encoded {
             // temp + rename so a cover is never read half-written
-            let target = file_for(*id);
+            let target = file_for(*id, media_type);
+            if let Some(dir) = target.parent() {
+                let _ = std::fs::create_dir_all(dir);
+            }
             let tmp = target.with_extension("jxl.tmp");
             if std::fs::write(&tmp, &data).is_ok() && std::fs::rename(&tmp, &target).is_ok()
             {
@@ -333,25 +451,32 @@ fn write_atomic(path: &std::path::Path, bytes: &[u8]) -> bool {
 
 // Stores downloaded cover bytes: JPEG -> .jxl (preferred), JXL -> .jxl as-is,
 // anything else (e.g. PNG) -> legacy .jpg so it can still be served.
-pub fn store_cover_bytes(db: &Db, anilist_id: i64, bytes: &[u8]) -> Option<String> {
-    if let Some(dir) = file_for(anilist_id).parent() {
+pub fn store_cover_bytes(
+    db: &Db,
+    anilist_id: i64,
+    media_type: &str,
+    bytes: &[u8],
+) -> Option<String> {
+    let file = file_for(anilist_id, media_type);
+    if let Some(dir) = file.parent() {
         let _ = std::fs::create_dir_all(dir);
     }
     if is_jxl(bytes) {
-        let file = file_for(anilist_id);
         if write_atomic(&file, bytes) {
-            let _ = std::fs::remove_file(legacy_file_for(anilist_id));
+            let _ = std::fs::remove_file(legacy_file_for(anilist_id, media_type));
+            let _ = std::fs::remove_file(root_file_for(anilist_id, "jpg"));
+            let _ = std::fs::remove_file(root_file_for(anilist_id, "jxl"));
             let path = file.to_string_lossy().to_string();
             db.media_set_cover_file(anilist_id, &path);
             return Some(path);
         }
         return None;
     }
-    if store_jpeg_as_jxl(db, anilist_id, bytes).is_some() {
-        return Some(file_for(anilist_id).to_string_lossy().to_string());
+    if store_jpeg_as_jxl(db, anilist_id, media_type, bytes).is_some() {
+        return Some(file.to_string_lossy().to_string());
     }
     // fallback: keep the original bytes renderable (decoded as-is by the webview)
-    let file = legacy_file_for(anilist_id);
+    let file = legacy_file_for(anilist_id, media_type);
     if write_atomic(&file, bytes) {
         let path = file.to_string_lossy().to_string();
         db.media_set_cover_file(anilist_id, &path);
@@ -418,19 +543,14 @@ fn image_mime(bytes: &[u8]) -> &'static str {
 }
 
 pub fn image_data(anilist_id: i64) -> Option<String> {
-    let jxl_path = file_for(anilist_id);
-    if jxl_path.exists() {
-        let bytes = std::fs::read(&jxl_path).ok()?;
+    let path = find_file(anilist_id)?;
+    let bytes = std::fs::read(&path).ok()?;
+    if path.extension().and_then(|e| e.to_str()) == Some("jxl") || is_jxl(&bytes) {
         let jpeg = jxl_to_jpeg(&bytes)?;
         let b64 = base64::engine::general_purpose::STANDARD.encode(jpeg);
         return Some(format!("data:image/jpeg;base64,{b64}"));
     }
-    // legacy .jpg fallback (covers downloaded before JPEG XL adoption)
-    let path = legacy_file_for(anilist_id);
-    if !path.exists() {
-        return None;
-    }
-    let bytes = std::fs::read(&path).ok()?;
+    // legacy covers downloaded before JPEG XL adoption
     let mime = image_mime(&bytes);
     let b64 = base64::engine::general_purpose::STANDARD.encode(bytes);
     Some(format!("data:{mime};base64,{b64}"))

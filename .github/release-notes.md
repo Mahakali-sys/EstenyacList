@@ -2,25 +2,14 @@
 
 Built from commit `{{COMMIT}}` by the release workflow on GitHub Actions.
 
-## Hotfix
+## Hotfix: manga imports and scoring
 
-- Fixed the audio/subtitle track menu opening behind the video. The built-in player now leaves a strip on the right side of the window while the menu is open, so the track list is visible and selectable. This is a video-layer fix, not just a z-index change: a native video surface always paints over the web UI.
-
-## Dependency security fixes
-
-- Updated Vite to 7.3.7 and source-map-js to 1.2.2, closing five Dependabot advisories in the frontend build tooling (including a high-severity Windows argument-injection issue in `launch-editor`).
-- Updated rustls to 0.23.46, closing four Dependabot advisories in the TLS stack used by reqwest and rqbit.
-- The remaining Dependabot alert for `glib` covers the Linux GTK stack only. This release is a Windows build and does not compile or ship glib; the alert stays open until Tauri moves to a newer gtk-rs generation.
-
-## Included from 0.1.2
-
-The localization changes are unchanged:
-
-- The app defaults to English with US Eastern time (`America/New_York`).
-- Settings → General has a timezone picker with every IANA timezone and a filter box.
-- Airing days, airing times, and countdowns follow the selected timezone.
-- Dates, sync timestamps, stats months, and the activity heatmap follow the selected timezone.
-- Activity days are recorded and the airing schedule is refreshed around midnight in the selected timezone.
+- MyAnimeList manga exports now import. The parser previously recognized only anime field names, so a `mangalist_*.xml` file reported zero entries and imported nothing.
+- Manga entries now carry over read chapters, score, reading status, start and finish dates, notes, and reread counts.
+- MAL stores the total number of reads in `my_times_read` and includes the first read. The app stores rereads only, so an imported value of `1` becomes `0` rereads and `3` becomes `2`.
+- MAL XML export now writes manga-specific elements (`manga_mangadb_id`, `manga_title`, `my_read_chapters`, `my_times_read`, and related fields) instead of anime fields, so manga lists round-trip correctly with MAL and other list tools.
+- The Add Manga button now opens search on the Manga tab. Manga search, adding, progress updates, status changes, scores, dates, notes, and rereads all work against the manga list.
+- Anime and manga covers are cached in separate directories (`cache/images/anime` and `cache/images/manga`). The existing flat cache and legacy JPEG covers are migrated automatically on the next launch, and re-downloading covers stores each type in its own directory.
 
 ## Assets
 
