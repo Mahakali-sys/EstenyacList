@@ -3,6 +3,7 @@ use crate::scheduler::AppState;
 use serde::Serialize;
 use serde_json::json;
 use std::sync::Arc;
+use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter, State};
 
 pub fn fmt_err<E: std::fmt::Display>(e: E) -> String {
@@ -323,24 +324,32 @@ async fn cache_missing_covers(db: Arc<crate::db::Db>, app: Option<&AppHandle>) -
         return 0;
     };
     let mut done = 0usize;
+    let mut last_progress = Instant::now();
     for (i, (anilist_id, url, media_type)) in jobs.into_iter().enumerate() {
-        if crate::images::file_for(anilist_id, &media_type).exists()
-            || crate::images::find_file(anilist_id).is_some()
-        {
+        let cached = crate::images::file_for(anilist_id, &media_type).exists()
+            || crate::images::find_file(anilist_id).is_some();
+        if cached {
             done += 1;
-        } else if let Some(bytes) = crate::images::fetch_bytes(client, &url).await {
-            if crate::images::store_cover_bytes(&db, anilist_id, &media_type, &bytes).is_some() {
-                done += 1;
+        } else {
+            if let Some(bytes) = crate::images::fetch_bytes(client, &url).await {
+                if crate::images::store_cover_bytes(&db, anilist_id, &media_type, &bytes).is_some() {
+                    done += 1;
+                }
             }
+            // only pace real CDN requests; cached entries are skipped quickly
+            tokio::time::sleep(Duration::from_millis(25)).await;
         }
         if let Some(app) = app {
-            app.emit(
-                "covers-progress",
-                json!({ "processed": i + 1, "total": total }),
-            )
-            .ok();
+            let processed = i + 1;
+            if processed == total || last_progress.elapsed() >= Duration::from_millis(100) {
+                app.emit(
+                    "covers-progress",
+                    json!({ "processed": processed, "total": total }),
+                )
+                .ok();
+                last_progress = Instant::now();
+            }
         }
-        tokio::time::sleep(std::time::Duration::from_millis(25)).await;
     }
     done
 }
@@ -951,7 +960,7 @@ fn fuzzy_date_string(v: Option<&serde_json::Value>) -> Option<String> {
 /// local-only entries are kept. Pending pushes should be flushed by the
 /// frontend before calling this.
 #[tauri::command]
-pub async fn anilist_pull(state: S<'_>) -> Result<PullReport, String> {
+pub async fn anilist_pull(app: AppHandle, state: S<'_>) -> Result<PullReport, String> {
     let app_state = state.inner().clone();
     let db = app_state.db.clone();
     let anilist = app_state.anilist.clone();
@@ -998,28 +1007,26 @@ pub async fn anilist_pull(state: S<'_>) -> Result<PullReport, String> {
                 db.media_upsert(&MediaRow::from_json(&media))
                     .map_err(fmt_err)?;
 
-                // map the first enabled AniList custom list to a local one,
+                // customLists is a JSON object of list name -> enabled; map
+                // the first enabled AniList custom list to a local one,
                 // creating it when the name is new
                 let mut custom_list_id: Option<i64> = None;
-                for cl in entry
+                for (name, enabled) in entry
                     .get("customLists")
-                    .and_then(|v| v.as_array())
+                    .and_then(|v| v.as_object())
                     .into_iter()
                     .flatten()
                 {
-                    if !cl.get("enabled").and_then(|x| x.as_bool()).unwrap_or(true) {
+                    if !enabled.as_bool().unwrap_or(false) {
                         continue;
                     }
-                    let Some(name) = cl.get("name").and_then(|x| x.as_str()) else {
-                        continue;
-                    };
                     if name.trim().is_empty() {
                         continue;
                     }
                     let find = || {
                         db.custom_lists()
                             .into_iter()
-                            .find(|l| l.media_type == media_type && l.name == name)
+                            .find(|l| l.media_type == media_type && l.name == name.as_str())
                             .map(|l| l.id)
                     };
                     custom_list_id = find();
@@ -1078,10 +1085,10 @@ pub async fn anilist_pull(state: S<'_>) -> Result<PullReport, String> {
         .filter(|e| !seen.contains(&(e.media_type.clone(), e.anilist_id)))
         .count();
 
-    // fill the cover cache for anything new, quietly, in the background
+    // fill the cover cache for anything new in the background
     let db2 = db.clone();
     tauri::async_runtime::spawn(async move {
-        cache_missing_covers(db2, None).await;
+        cache_missing_covers(db2, Some(&app)).await;
     });
 
     Ok(PullReport {

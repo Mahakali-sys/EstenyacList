@@ -2,14 +2,13 @@
 
 Built from commit `{{COMMIT}}` by the release workflow on GitHub Actions.
 
-## Hotfix: manga imports and scoring
+This version fixes pulling from AniList and polishes the post-pull cover cache pass.
 
-- MyAnimeList manga exports now import. The parser previously recognized only anime field names, so a `mangalist_*.xml` file reported zero entries and imported nothing.
-- Manga entries now carry over read chapters, score, reading status, start and finish dates, notes, and reread counts.
-- MAL stores the total number of reads in `my_times_read` and includes the first read. The app stores rereads only, so an imported value of `1` becomes `0` rereads and `3` becomes `2`.
-- MAL XML export now writes manga-specific elements (`manga_mangadb_id`, `manga_title`, `my_read_chapters`, `my_times_read`, and related fields) instead of anime fields, so manga lists round-trip correctly with MAL and other list tools.
-- The Add Manga button now opens search on the Manga tab. Manga search, adding, progress updates, status changes, scores, dates, notes, and rereads all work against the manga list.
-- Anime and manga covers are cached in separate directories (`cache/images/anime` and `cache/images/manga`). The existing flat cache and legacy JPEG covers are migrated automatically on the next launch, and re-downloading covers stores each type in its own directory.
+## Hotfix: AniList pull and cover caching
+
+- AniList pulls no longer fail with `Field "customLists" of type "Json" must not have a sub selection`. The pull query now requests the JSON scalar directly, and custom-list membership is read from the returned name-to-enabled map.
+- The cover pass that runs after a pull now emits progress through the same `covers-progress` event as the manual cover action.
+- Cover caching skips the 25 ms CDN pause for covers that are already on disk, so repeat pulls over a large cached list no longer spend about a minute on that delay.
 
 ## Assets
 

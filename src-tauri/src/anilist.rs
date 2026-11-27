@@ -248,7 +248,7 @@ impl AniList {
                         notes
                         startedAt {{ year month day }}
                         completedAt {{ year month day }}
-                        customLists {{ name enabled }}
+                        customLists
                         media {{ {media_fields} }}
                     }} }}
                 }}

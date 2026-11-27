@@ -41,7 +41,9 @@ export function DataSection() {
     api.listBackups().then(setBackups).catch(() => {});
     let unlisten: (() => void) | undefined;
     listen<{ processed: number; total: number }>("covers-progress", (e) => {
-      setCoversProgress(e.payload);
+      setCoversProgress(
+        e.payload.processed >= e.payload.total ? null : e.payload,
+      );
     }).then((un) => {
       unlisten = un;
     });
@@ -182,7 +184,7 @@ export function DataSection() {
         {coversProgress && (
           <div className="mt-3">
             <div className="mb-1 flex justify-between font-mono text-[10px]">
-              <span className="text-fg-muted">re-downloading covers…</span>
+              <span className="text-fg-muted">caching covers…</span>
               <span className="text-fg-faint tnum">
                 {coversProgress.processed}/{coversProgress.total}
               </span>
